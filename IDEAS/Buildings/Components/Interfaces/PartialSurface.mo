@@ -87,7 +87,7 @@ partial model PartialSurface "Partial model for building envelope component"
                   add_cracks and
        sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None
     "Middle or bottom crack "
-    annotation (Placement(transformation(extent={{20,-50},{40,-30}})));
+    annotation (Placement(transformation(extent={{20,-42},{40,-22}})));
   PowerLaw_q50 res2(
   redeclare package Medium = Medium,
     final forceErrorControlOnFlow=false,
@@ -282,8 +282,9 @@ equation
       points={{70,20.2105},{60,20.2105},{60,20},{56,20}},
       color={255,204,51},
       thickness=0.5));
-  connect(res1.port_b, propsBusInt.port_1) annotation (Line(points={{40,-40},{50,
-          -40},{50,19.91},{56.09,19.91}}, color={0,127,255}));
+  connect(res1.port_b, propsBusInt.port_1) annotation (Line(points={{40,-32},{
+          50,-32},{50,19.91},{56.09,19.91}},
+                                          color={0,127,255}));
   connect(res2.port_b, propsBusInt.port_2) annotation (Line(points={{40,-60},{50,
           -60},{50,19.91},{56.09,19.91}}, color={0,127,255}));
   connect(setArea.areaPort, sim.areaPort);
