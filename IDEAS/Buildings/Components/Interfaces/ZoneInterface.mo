@@ -29,10 +29,10 @@ partial model ZoneInterface "Partial model for thermal building zones"
     "Nominal flow rate of the air flow system fluid ports"
     annotation(Dialog(tab="Advanced",group="Air model"));
 
-    parameter Boolean custome_n50=false "true if custom value for n50 is used" annotation(Dialog(group="Building physics"));
+    parameter Boolean custome_n50=false "check if custom value for n50 is used" annotation(Dialog(group="Building physics"),choices(checkBox=true));
     parameter Real n50(min=0.01)= sim.n50_cor
     "n50 value cfr airtightness, i.e. the ACH at a pressure diffence of 50 Pa"
-    annotation(Dialog(group="Building physics"));
+    annotation(Dialog(enable = custome_n50,group="Building physics"));
 
   Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_b gainRad
     "Internal zone node for radiative heat gains"
