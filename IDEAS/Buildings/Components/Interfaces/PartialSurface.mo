@@ -45,6 +45,12 @@ partial model PartialSurface "Partial model for building envelope component"
   parameter Real q50( unit="m3/(h.m2)") = sim.q50
     "Envelope air tightness"
     annotation(Dialog(group="Interzonal airflow (Optional)"));
+
+
+
+
+
+                                                  //WIP
   IDEAS.Buildings.Components.Interfaces.ZoneBus propsBus_a(
     redeclare final package Medium = Medium,
     numIncAndAziInBus=sim.numIncAndAziInBus, outputAngles=sim.outputAngles,
@@ -103,6 +109,10 @@ partial model PartialSurface "Partial model for building envelope component"
 protected
   parameter Boolean add_cracks = true
     "Add cracks";
+
+  parameter Real v50=A*q50 "total flow through this component at 50pa";
+
+
   final parameter Modelica.SIunits.Angle aziInt=
     if aziOpt==5
     then azi
@@ -149,6 +159,12 @@ protected
     "Block that contributes surface area to the siminfomanager"
     annotation (Placement(transformation(extent={{80,-100},{100,-80}})));
 
+
+
+
+
+
+
 model PowerLaw_q50
 
     extends IDEAS.Airflow.Multizone.BaseClasses.PowerLawResistance(
@@ -163,6 +179,9 @@ model PowerLaw_q50
     "Conversion coefficient";
 equation
   v= V_flow/A;
+  propsBusInt.v50=v50;
+
+
   annotation (Icon(graphics={
         Text(
           extent={{-100,100},{-40,60}},
@@ -233,6 +252,8 @@ equation
 end PowerLaw_q50;
 
 equation
+
+
   connect(prescribedHeatFlowE.port, propsBusInt.E);
   connect(Qgai.y,prescribedHeatFlowQgai. Q_flow);
   connect(prescribedHeatFlowQgai.port, propsBusInt.Qgai);
@@ -282,9 +303,8 @@ equation
       points={{70,20.2105},{60,20.2105},{60,20},{56,20}},
       color={255,204,51},
       thickness=0.5));
-  connect(res1.port_b, propsBusInt.port_1) annotation (Line(points={{40,-32},{
-          50,-32},{50,19.91},{56.09,19.91}},
-                                          color={0,127,255}));
+  connect(res1.port_b, propsBusInt.port_1) annotation (Line(points={{40,-32},{50,
+          -32},{50,19.91},{56.09,19.91}}, color={0,127,255}));
   connect(res2.port_b, propsBusInt.port_2) annotation (Line(points={{40,-60},{50,
           -60},{50,19.91},{56.09,19.91}}, color={0,127,255}));
   connect(setArea.areaPort, sim.areaPort);
