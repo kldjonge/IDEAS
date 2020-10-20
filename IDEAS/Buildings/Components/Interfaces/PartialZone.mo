@@ -11,9 +11,7 @@ model PartialZone "Building zone model"
     Modelica.Media.Interfaces.PartialMedium "Medium in the component"
       annotation (choicesAllMatching = true);
 
-  parameter Real n50(min=0.01)= sim.n50
-    "n50 value cfr airtightness, i.e. the ACH at a pressure diffence of 50 Pa"
-    annotation(Dialog(group="Building physics"));
+
   parameter Boolean allowFlowReversal=true
     "= true to allow flow reversal in zone, false restricts to design direction (port_a -> port_b)."
     annotation(Dialog(tab="Advanced", group="Air model"));
@@ -42,7 +40,7 @@ model PartialZone "Building zone model"
     annotation(Dialog(tab = "Initialization"));
   parameter Real fRH=11
     "Reheat factor for calculation of design heat load, (EN 12831, table D.10 Annex D)" annotation(Dialog(tab="Advanced",group="Design heat load"));
-  parameter Modelica.SIunits.Temperature Tzone_nom = 295.15
+  parameter Modelica.SIunits.Temperature Tzone_nom=295.15
     "Nominal zone temperature, used for linearising radiative heat exchange"
     annotation(Dialog(tab="Advanced", group="Radiative heat exchange", enable=linIntRad));
   parameter Modelica.SIunits.TemperatureDifference dT_nom = -2
@@ -50,6 +48,11 @@ model PartialZone "Building zone model"
     annotation(Dialog(tab="Advanced", group="Radiative heat exchange", enable=linIntRad));
   parameter Boolean simVieFac=false "Simplify view factor computation"
     annotation(Dialog(tab="Advanced", group="Radiative heat exchange"));
+
+  parameter Modelica.SIunits.VolumeFlowRate V50cust; //WIP
+  parameter Modelica.SIunits.VolumeFlowRate V50add;  //WIP
+
+
 
   replaceable ZoneAirModels.WellMixedAir airModel
   constrainedby
@@ -213,10 +216,27 @@ protected
         rotation=270,
         origin={-30,-10})));
 
+    Boolean[nSurf] Boolanarray "array of costume q50 boolean arrays";
+    Real [nSurf] BoolReal "Boolean array converted to Real";
+    Modelica.SIunits.VolumeFlowRate [nSurf] v50_array "array of surface v50 values";
 
 
 initial equation
   Q_design=QInf_design+QRH_design+QTra_design; //Total design load for zone (additional ventilation losses are calculated in the ventilation system)
+
+  for i in nSurf loop
+    propsBusInt.q50_costume=Boolanarray[i]; //add all boolean values to an array
+    propsBusInt.v50=v50_array[i]; // add v50's to an array
+
+    BoolReal= if Boolanarray[i] then 1 else 0; //Convert boolean value to real
+  end for;
+
+  V50cust=sum(v50_array*BoolReal); //costumeflow
+  V50add=V50-Vcust;
+
+  // q50_cor=sum(propsBusInt.area) todo: corrected q50 based on internal wall or not and if costume flow is present
+
+//WIP
 
 equation
   if interzonalAirFlow.verifyBothPortsConnected then

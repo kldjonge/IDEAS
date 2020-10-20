@@ -9,6 +9,15 @@ connector ZoneBus
   parameter Boolean use_port_1 = false;
   parameter Boolean use_port_2 = false;
 
+
+  Boolean q50_costume=false;
+  Boolean InternalWall "true if component is not connected to the outdoors";
+
+  IDEAS.Buildings.Components.Interfaces.RealConnector v50(
+    final quantity="Flowrate",
+    final unit="m3/h") annotation ();
+
+
   IDEAS.Buildings.Components.Interfaces.RealConnector QTra_design(
     final quantity="Power",
     final unit="W") annotation ();
