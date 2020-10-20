@@ -29,6 +29,11 @@ partial model ZoneInterface "Partial model for thermal building zones"
     "Nominal flow rate of the air flow system fluid ports"
     annotation(Dialog(tab="Advanced",group="Air model"));
 
+    parameter Boolean custome_n50=false "true if custom value for n50 is used" annotation(Dialog(group="Building physics"));
+    parameter Real n50(min=0.01)= sim.n50_cor
+    "n50 value cfr airtightness, i.e. the ACH at a pressure diffence of 50 Pa"
+    annotation(Dialog(group="Building physics"));
+
   Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_b gainRad
     "Internal zone node for radiative heat gains"
     annotation (Placement(transformation(extent={{90,-70},{110,-50}})));
@@ -67,9 +72,11 @@ partial model ZoneInterface "Partial model for thermal building zones"
         extent={{-10,-40},{10,40}},
         rotation=90,
         origin={0,100})));
-  SetVolume setVolume(V=V)
+  SetVolume setVolume(V=V, custome_n50=custome_n50)
     "Component for contributing zone volume to siminfomanager"
-    annotation (Placement(transformation(extent={{-60,80},{-40,100}})));
+    annotation (Placement(transformation(extent={{-52,80},{-32,100}})));
+  SetV50 setV50(V50=n50*V, custome_n50=custome_n50)
+    annotation (Placement(transformation(extent={{-78,80},{-58,100}})));
 protected
   Modelica.Blocks.Sources.RealExpression Eexpr "Internal energy model";
   BaseClasses.ConservationOfEnergy.PrescribedEnergy prescribedHeatFlowE
@@ -108,6 +115,7 @@ equation
   connect(prescribedHeatFlowQgai.port, sim.Qgai);
 
   connect(setVolume.volumePort, sim.volumePort);
+  connect(setV50.v50Port,sim.v50Port);
   annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
             -100},{100,100}})),           Icon(coordinateSystem(
           preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics={

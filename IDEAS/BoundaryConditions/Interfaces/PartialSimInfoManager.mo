@@ -1,4 +1,4 @@
-within IDEAS.BoundaryConditions.Interfaces;
+﻿within IDEAS.BoundaryConditions.Interfaces;
 partial model PartialSimInfoManager
   "Partial providing structure for SimInfoManager"
 
@@ -93,7 +93,7 @@ partial model PartialSimInfoManager
     "Type of interzonal air flow model"
     annotation(Dialog(group="Interzonal airflow"),Evaluate=true);
   parameter Real n50 = 0.4
-    "n50 value of zones"
+    "n50 value of building"
     annotation(Dialog(group="Interzonal airflow"));
 
   final parameter Integer numIncAndAziInBus = size(incAndAziInBus,1)
@@ -166,7 +166,16 @@ partial model PartialSimInfoManager
     annotation (Placement(transformation(extent={{60,-30},{80,-10}})));
   final parameter Modelica.SIunits.MassFlowRate m_flow_infiltration_nominal(fixed=false);
   final parameter Real q50( unit="m3/(h.m2)") = ((m_flow_infiltration_nominal*3600/1.2)/A_tot);
+
   final parameter Modelica.SIunits.Area A_tot(fixed=false) "Total surface area of OuterWalls and Windows";
+  final parameter Modelica.SIunits.Volume V_tot( fixed=false) "Total building volume, sum of all zone volumes";
+
+  final parameter Modelica.SIunits.Volume V_add( fixed=false) "volume of zones with default, inherited n50";
+  final parameter Modelica.SIunits.VolumeFlowRate V50_tot=n50*V_tot "Total building inflitration flowrate at 50Pa";
+  final parameter  Modelica.SIunits.VolumeFlowRate V50_cust( fixed=false) "custom volume flowrate at 50Pa";
+  final parameter  Modelica.SIunits.VolumeFlowRate V50_add=V50_tot-V50_cust "non-custom volume flowrate at 50Pa";
+  final parameter  Real n50_cor=V50_add/V_add "corrected n50 value";
+
   input IDEAS.Buildings.Components.Interfaces.WindowBus[nWindow] winBusOut(
       each nLay=nLayWin) if createOutputs
     "Bus for windows in case of linearisation";
@@ -188,6 +197,8 @@ partial model PartialSimInfoManager
     "Port for summing surface areas of all surfaces"
     annotation (Placement(transformation(extent={{70,-110},{90,-90}})));
 
+  Buildings.Components.Interfaces.V50Port v50Port
+    annotation (Placement(transformation(extent={{108,-110},{128,-90}})));
 protected
   final parameter Integer yr=2014 "depcited year for DST only";
 
@@ -239,13 +250,32 @@ protected
     annotation (Placement(transformation(extent={{-86,136},{-78,144}})));
 initial equation
   m_flow_infiltration_nominal = volumePort.V_tot*n50*1.2/3600;
+  V_tot=volumePort.V_tot;
   A_tot=areaPort.A_tot;
+  V_add=volumePort.V_add;
+
+  V50_cust=v50Port.V50;
+/*
+  V50_tot=V50_add+V50_cust;
+  n50_cor=V50_add/V_add;
+*/
+
+
   if not linearise and computeConservationOfEnergy then
     Etot = 0;
   end if;
+
+
 equation
   volumePort.V_tot + volumePort.V = 0;
   areaPort.A_tot + areaPort.A = 0;
+
+  v50Port.V50+v50Port.V50_zone=0;//WIP
+  volumePort.V_add+volumePort.V_add_zone=0; //WIP
+
+
+
+
   if strictConservationOfEnergy and computeConservationOfEnergy then
     assert(abs(Etot) < Emax, "Conservation of energy violation > Emax J!");
   end if;
