@@ -4,6 +4,7 @@ PartialOpaqueSurface
 PartialSurface
 PartialZone
 RealConnector
+BooleanConnector
 RectangularZoneTemplateInterface
 SolBus
 WeaBus
@@ -14,5 +15,9 @@ ZoneBusVarMultiplicator
 ZoneInterface
 VolumePort
 AreaPort
+V50Port
 SetVolume
 SetArea
+SetV50
+Setq50
+Setq50_surf

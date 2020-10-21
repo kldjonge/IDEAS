@@ -49,8 +49,7 @@ model PartialZone "Building zone model"
   parameter Boolean simVieFac=false "Simplify view factor computation"
     annotation(Dialog(tab="Advanced", group="Radiative heat exchange"));
 
-  parameter Modelica.SIunits.VolumeFlowRate V50cust; //WIP
-  parameter Modelica.SIunits.VolumeFlowRate V50add;  //WIP
+
 
 
 
@@ -170,6 +169,10 @@ model PartialZone "Building zone model"
 
 
 
+  Setq50 setq50(nSurf=nSurf, V50=V50)    annotation (Placement(transformation(extent={{-60,-94},
+            {-40,-74}})));                                                                                     //setq50 internal model
+
+
 protected
   parameter Integer n_ports_interzonal=
     if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then 0
@@ -216,29 +219,66 @@ protected
         rotation=270,
         origin={-30,-10})));
 
-    Boolean[nSurf] Boolanarray "array of costume q50 boolean arrays";
-    Real [nSurf] BoolReal "Boolean array converted to Real";
-    Modelica.SIunits.VolumeFlowRate [nSurf] v50_array "array of surface v50 values";
 
 
-initial equation
-  Q_design=QInf_design+QRH_design+QTra_design; //Total design load for zone (additional ventilation losses are calculated in the ventilation system)
 
-  for i in nSurf loop
-    propsBusInt.q50_costume=Boolanarray[i]; //add all boolean values to an array
-    propsBusInt.v50=v50_array[i]; // add v50's to an array
+    model Setq50 "Block for setting the corrected q50 of the walls"
 
-    BoolReal= if Boolanarray[i] then 1 else 0; //Convert boolean value to real
-  end for;
+    extends
+          Modelica.Blocks.Icons.Block;
 
-  V50cust=sum(v50_array*BoolReal); //costumeflow
-  V50add=V50-Vcust;
+    parameter Integer nSurf(min=1)
+      "number of surfaces in contact with the zone";
+    parameter Modelica.SIunits.VolumeFlowRate V50;
 
-  // q50_cor=sum(propsBusInt.area) todo: corrected q50 based on internal wall or not and if costume flow is present
+    parameter Modelica.SIunits.VolumeFlowRate V50_cust(fixed=false);
+    parameter Modelica.SIunits.VolumeFlowRate V50_add(fixed=false);
 
-//WIP
+
+    parameter Real NotintWall_real[nSurf]( fixed=false);
+    parameter Real q50_cust_real[nSurf]( fixed=false);
+    parameter Real q50_add_real[nSurf]( fixed=false);
+
+    Modelica.Blocks.Interfaces.RealInput A[nSurf]
+      annotation (Placement(transformation(extent={{-124,48},{-84,88}})));
+    Modelica.Blocks.Interfaces.RealInput v50[nSurf]
+      annotation (Placement(transformation(extent={{-124,12},{-84,52}})));
+    Modelica.Blocks.Interfaces.BooleanInput IntWall[nSurf]
+      annotation (Placement(transformation(extent={{-124,-34},{-84,6}})));
+      Modelica.Blocks.Interfaces.BooleanInput q50_custome[nSurf]
+      annotation (Placement(transformation(extent={{-124,-72},{-84,-32}})));
+
+    parameter Modelica.Blocks.Interfaces.RealOutput q50_cor[nSurf](unit="m3/(h.m2)", fixed=false)
+      annotation (Placement(transformation(extent={{-96,-100},{-116,-80}})));
+
+    initial equation
+
+    for
+    i in 1:nSurf loop
+
+      NotintWall_real[i] = if not IntWall[i] then 1 else 0;
+      q50_cust_real[i] = if q50_custome[i] then 1 else 0;
+      q50_add_real[i] = if not q50_custome[i] then 1 else 0;
+
+      q50_cor[i] = (V50_add/sum(A*NotintWall_real*q50_add_real))*3600;
+
+    end for;
+
+    V50_cust = sum(q50_cust_real*v50);
+    V50 = V50_add + V50_cust;
+
+    annotation (Icon(graphics={Rectangle(extent={{-72,84},{80,-84}}, lineColor={
+                28,
+              108,200}), Ellipse(extent={{-60,62},{64,-62}}, lineColor={28,108,200})}));
+    end Setq50;
+
+
 
 equation
+  Q_design=QInf_design+QRH_design+QTra_design; //Total design load for zone (additional ventilation losses are calculated in the ventilation system)
+
+
+
   if interzonalAirFlow.verifyBothPortsConnected then
     assert(cardinality(port_a)>1 and cardinality(port_b)>1 or cardinality(port_a) == 1 and cardinality(port_b) == 1,
       "WARNING: Only one of the FluidPorts of " + getInstanceName() + " is 
@@ -426,6 +466,24 @@ end for;
     connect(airModel.ports[interzonalAirFlow.nPorts + 1 + nSurf:interzonalAirFlow.nPorts + nSurf*2], propsBusInt[1:nSurf].port_2) annotation (Line(points={{-30,
           40},{-30,39.9},{-80.1,39.9}}, color={0,127,255}));
   end if;
+
+  //for i in 1:nSurf loop
+  connect(setq50.A[1:nSurf], propsBusInt[1:nSurf].area) annotation (Line(points={{-60.4,-77.2},{-60.4,
+          -78},{-80.1,-78},{-80.1,39.9}}, color={0,0,127}));
+  connect(setq50.v50[1:nSurf], propsBusInt[1:nSurf].v50) annotation (Line(points={{-60.4,-80.8},{-60.4,
+          -81.4},{-80.1,-81.4},{-80.1,39.9}}, color={0,0,127}));
+  connect(setq50.IntWall[1:nSurf], propsBusInt[1:nSurf].InternalWall) annotation (Line(points={{-60.4,
+          -85.4},{-60.4,-85.7},{-80.1,-85.7},{-80.1,39.9}}, color={255,0,255}));
+  connect(setq50.q50_custome[1:nSurf], propsBusInt[1:nSurf].q50_costume) annotation (Line(points={
+          {-60.4,-89.2},{-60.4,-88.6},{-80.1,-88.6},{-80.1,39.9}}, color={255,0,
+          255}));
+  connect(setq50.q50_cor[1:nSurf], propsBusInt[1:nSurf].q50_zone) annotation (Line(points={{-60.6,
+          -93},{-60.6,-92.5},{-80.1,-92.5},{-80.1,39.9}}, color={0,0,127}));
+
+  //end for;
+
+
+
   annotation (Placement(transformation(extent={{
             140,48},{100,88}})),
     Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),

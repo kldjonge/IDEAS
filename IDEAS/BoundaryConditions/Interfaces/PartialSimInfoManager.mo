@@ -92,7 +92,7 @@ partial model PartialSimInfoManager
     IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None
     "Type of interzonal air flow model"
     annotation(Dialog(group="Interzonal airflow"),Evaluate=true);
-  parameter Real n50 = 0.4
+  parameter Real n50(unit="1/h") = 0.4
     "n50 value of building"
     annotation(Dialog(group="Interzonal airflow"));
 
@@ -171,10 +171,10 @@ partial model PartialSimInfoManager
   final parameter Modelica.SIunits.Volume V_tot( fixed=false) "Total building volume, sum of all zone volumes";
 
   final parameter Modelica.SIunits.Volume V_add( fixed=false) "volume of zones with default, inherited n50";
-  final parameter Modelica.SIunits.VolumeFlowRate V50_tot=n50*V_tot "Total building inflitration flowrate at 50Pa";
+  final parameter Modelica.SIunits.VolumeFlowRate V50_tot=n50*V_tot/3600 "Total building inflitration flowrate at 50Pa";
   final parameter  Modelica.SIunits.VolumeFlowRate V50_cust( fixed=false) "custom volume flowrate at 50Pa";
   final parameter  Modelica.SIunits.VolumeFlowRate V50_add=V50_tot-V50_cust "non-custom volume flowrate at 50Pa";
-  final parameter  Real n50_cor=V50_add/V_add "corrected n50 value";
+  final parameter  Real n50_cor(unit="1/h")=(V50_add/V_add)*3600  "corrected n50 value";
 
   input IDEAS.Buildings.Components.Interfaces.WindowBus[nWindow] winBusOut(
       each nLay=nLayWin) if createOutputs
@@ -255,10 +255,6 @@ initial equation
   V_add=volumePort.V_add;
 
   V50_cust=v50Port.V50;
-/*
-  V50_tot=V50_add+V50_cust;
-  n50_cor=V50_add/V_add;
-*/
 
 
   if not linearise and computeConservationOfEnergy then
