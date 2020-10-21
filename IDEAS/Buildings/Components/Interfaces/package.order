@@ -16,3 +16,5 @@ VolumePort
 AreaPort
 SetVolume
 SetArea
+SetV50
+V50Port
