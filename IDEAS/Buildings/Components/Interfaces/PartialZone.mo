@@ -11,7 +11,7 @@ model PartialZone "Building zone model"
     Modelica.Media.Interfaces.PartialMedium "Medium in the component"
       annotation (choicesAllMatching = true);
 
-  parameter Real n50(min=0.01)= sim.n50
+  parameter Real n50(min=0.01)= sim.n50_cor
     "n50 value cfr airtightness, i.e. the ACH at a pressure diffence of 50 Pa"
     annotation(Dialog(group="Building physics"));
   parameter Boolean allowFlowReversal=true
