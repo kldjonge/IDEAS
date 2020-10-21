@@ -34,6 +34,7 @@ partial model ZoneInterface "Partial model for thermal building zones"
     "n50 value cfr airtightness, i.e. the ACH at a pressure diffence of 50 Pa"
     annotation(Dialog(enable = custome_n50,tab="Airflow",group="Zone Airtightness"));
 
+
   Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_b gainRad
     "Internal zone node for radiative heat gains"
     annotation (Placement(transformation(extent={{90,-70},{110,-50}})));
@@ -75,9 +76,11 @@ partial model ZoneInterface "Partial model for thermal building zones"
   SetVolume setVolume(V=V, custome_n50=custome_n50)
     "Component for contributing zone volume to siminfomanager"
     annotation (Placement(transformation(extent={{-52,80},{-32,100}})));
-  SetV50 setV50(V50=n50*V, custome_n50=custome_n50)
+  SetV50 setV50(V50=V50,   custome_n50=custome_n50)
     annotation (Placement(transformation(extent={{-78,80},{-58,100}})));
 protected
+  parameter Modelica.SIunits.VolumeFlowRate V50= V*n50*3600 "Volume flow rate out space at 50Pa";
+
   Modelica.Blocks.Sources.RealExpression Eexpr "Internal energy model";
   BaseClasses.ConservationOfEnergy.PrescribedEnergy prescribedHeatFlowE
     "Dummy that allows computing total internal energy";
@@ -106,6 +109,9 @@ initial equation
       Instead, increase nPorts and create a separate connection.",
       level=AssertionLevel.warning);
   end for;
+
+
+
 equation
   connect(sim.Qgai, dummy1);
   connect(sim.E, dummy2);

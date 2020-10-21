@@ -10,14 +10,14 @@ connector ZoneBus
   parameter Boolean use_port_2 = false;
 
 
-  Boolean q50_costume=false;
-  Boolean InternalWall "true if component is not connected to the outdoors";
-
+  IDEAS.Buildings.Components.Interfaces.BooleanConnector  q50_costume annotation ();
+  IDEAS.Buildings.Components.Interfaces.BooleanConnector InternalWall "true if component is not connected to the outdoors" annotation ();
+  IDEAS.Buildings.Components.Interfaces.RealConnector q50_zone(
+    final quantity="Airtightness",
+    final unit="m3/(h.m2)") annotation ();
   IDEAS.Buildings.Components.Interfaces.RealConnector v50(
-    final quantity="Flowrate",
-    final unit="m3/h") annotation ();
-
-
+    final quantity="VolumeFlowRate",
+    final unit="m3/s") annotation ();
   IDEAS.Buildings.Components.Interfaces.RealConnector QTra_design(
     final quantity="Power",
     final unit="W") annotation ();
