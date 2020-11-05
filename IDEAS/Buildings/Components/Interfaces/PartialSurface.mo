@@ -109,7 +109,7 @@ partial model PartialSurface "Partial model for building envelope component"
 
 
   Setq50_surf setq50(
-    v50=q50*A,
+    v50=v50,
     InternalWall=InternalWall,
     q50_costume=Custom_q50)
     annotation (Placement(transformation(extent={{60,-60},{80,-40}})));
@@ -263,15 +263,29 @@ model Setq50_surf
 
   parameter Real q50(fixed=false);
 
+  parameter Real v50;
+  parameter Boolean InternalWall;
+  parameter Boolean q50_costume;
+
+
+
   Modelica.Blocks.Interfaces.RealInput q50_zone annotation (Placement(transformation(extent={{-122,-86},{-82,-46}}), iconTransformation( extent={{-122,-86},{-82,-46}})));
 
-  parameter Modelica.Blocks.Interfaces.RealOutput v50    annotation (Placement(transformation(extent={{-96,-14},{-116,6}})));
-  parameter Modelica.Blocks.Interfaces.BooleanOutput InternalWall    annotation (Placement(transformation(extent={{-96,70},{-116,90}})));
-  parameter Modelica.Blocks.Interfaces.BooleanOutput q50_costume    annotation (Placement(transformation(extent={{-96,32},{-116,52}})));
+  Modelica.Blocks.Interfaces.RealOutput v50_int    annotation (Placement(transformation(extent={{-96,-14},{-116,6}})));
+  Modelica.Blocks.Interfaces.BooleanOutput InternalWall_int    annotation (Placement(transformation(extent={{-96,70},{-116,90}})));
+  Modelica.Blocks.Interfaces.BooleanOutput q50_costume_int    annotation (Placement(transformation(extent={{-96,32},{-116,52}})));
 
 initial equation
 
   q50=q50_zone;
+
+equation
+
+  v50_int=v50;
+  InternalWall_int=InternalWall;
+  q50_costume_int=q50_costume;
+
+
 
   annotation (Icon(graphics={Rectangle(extent={{-74,88},{78,-80}}, lineColor={28,
               108,200}), Ellipse(extent={{-64,68},{60,-56}}, lineColor={28,108,200})}));
@@ -337,15 +351,15 @@ equation
           -60},{50,19.91},{56.09,19.91}}, color={0,127,255}));
   connect(setArea.areaPort, sim.areaPort);
 
-  connect(setq50.InternalWall, propsBusInt.InternalWall) annotation (Line(
-        points={{59.4,-42},{56.09,-42},{56.09,19.91}}, color={255,0,255}));
-  connect(setq50.q50_costume, propsBusInt.q50_costume) annotation (Line(points={{59.4,
-          -45.8},{60,-45.8},{60,-46},{56.09,-46},{56.09,19.91}},  color={255,0,255}));
-  connect(setq50.v50, propsBusInt.v50) annotation (Line(points={{59.4,-50.4},{60,
-          -50.4},{60,-50},{56.09,-50},{56.09,19.91}},
-                                               color={0,0,127}));
+  connect(setq50.InternalWall_int, propsBusInt.InternalWall) annotation (Line(
+        points={{59.4,-42},{56,-42},{56,19.91},{56.09,19.91}}, color={255,0,255}));
+  connect(setq50.q50_costume_int, propsBusInt.q50_costume) annotation (Line(
+        points={{59.4,-45.8},{60,-45.8},{60,-46},{56.09,-46},{56.09,19.91}},
+        color={255,0,255}));
+  connect(setq50.v50_int, propsBusInt.v50) annotation (Line(points={{59.4,-50.4},
+          {60,-50.4},{60,-50},{56.09,-50},{56.09,19.91}}, color={0,0,127}));
   connect(setq50.q50_zone, propsBusInt.q50_zone) annotation (Line(points={{59.8,
-          -56.6},{59.8,-56},{56.09,-56},{56.09,19.91}},     color={0,0,127}));
+          -56.6},{59.8,-56},{56.09,-56},{56.09,19.91}}, color={0,0,127}));
   annotation (
     Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
             100,100}})),
