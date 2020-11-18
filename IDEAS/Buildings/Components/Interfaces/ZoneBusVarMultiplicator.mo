@@ -28,12 +28,8 @@ model ZoneBusVarMultiplicator "Component to scale all flows from the zone propsB
   outer BoundaryConditions.SimInfoManager       sim
     "Simulation information manager for climate data"
     annotation (Placement(transformation(extent={{72,122},{92,142}})));
-  Modelica.Blocks.Routing.RealPassThrough q50_zone
-    annotation (Placement(transformation(extent={{8,150},{-12,170}})));
-  Modelica.Blocks.Routing.BooleanPassThrough q50_costume
-    annotation (Placement(transformation(extent={{-12,226},{8,246}})));
-  Modelica.Blocks.Routing.BooleanPassThrough InternalWall
-    annotation (Placement(transformation(extent={{-14,200},{6,220}})));
+  Modelica.Blocks.Routing.BooleanPassThrough n50_cust
+    annotation (Placement(transformation(extent={{8,-324},{-12,-304}})));
 protected
   IDEAS.Fluid.BaseClasses.MassFlowRateMultiplier massFlowRateMultiplier2(
       redeclare package Medium = Medium,                                 final k=k) if
@@ -46,9 +42,9 @@ protected
     "Mass flow rate multiplier for port 1"
     annotation (Placement(transformation(extent={{-10,-170},{10,-150}})));
   Modelica.Blocks.Math.Gain QTra_desgin(k=k) "Design heat flow rate"
-    annotation (Placement(transformation(extent={{-10,282},{10,302}})));
+    annotation (Placement(transformation(extent={{-10,178},{10,198}})));
   Modelica.Blocks.Math.Gain area(k=k) "Heat exchange surface area"
-    annotation (Placement(transformation(extent={{-10,252},{10,272}})));
+    annotation (Placement(transformation(extent={{-10,150},{10,170}})));
   BaseClasses.Varia.HeatFlowMultiplicator surfCon(k=k)
     "Block for scaling convective heat transfer"
     annotation (Placement(transformation(extent={{-10,62},{10,82}})));
@@ -75,16 +71,23 @@ protected
     annotation (Placement(transformation(extent={{-10,118},{10,138}})));
   Modelica.Blocks.Routing.RealPassThrough epsSw "Shortwave emissivity"
     annotation (Placement(transformation(extent={{-10,88},{10,108}})));
-  Modelica.Blocks.Math.Gain v50(k=k) "Infiltration airflow at 50Pa"
-    annotation (Placement(transformation(extent={{-14,176},{6,196}})));
+  Modelica.Blocks.Math.Gain v50(k=k)
+    "v50 value if q50 of the surface is custome"
+    annotation (Placement(transformation(extent={{-10,-232},{10,-212}})));
+  Modelica.Blocks.Routing.RealPassThrough q50_zone
+    "q50 for non costume surfaces"
+    annotation (Placement(transformation(extent={{8,-268},{-12,-248}})));
+  Modelica.Blocks.Routing.RealPassThrough nonCust
+    "0 if the surface has a custom q50"
+    annotation (Placement(transformation(extent={{-12,-296},{8,-276}})));
 equation
-  connect(QTra_desgin.u, propsBus_a.QTra_design) annotation (Line(points={{-12,292},
-          {-100.1,292},{-100.1,0.1}},         color={0,0,127}));
-  connect(QTra_desgin.y, propsBus_b.QTra_design) annotation (Line(points={{11,292},
-          {100.1,292},{100.1,-0.1}},color={0,0,127}));
-  connect(area.u, propsBus_a.area) annotation (Line(points={{-12,262},{-100.1,
-          262},{-100.1,0.1}},color={0,0,127}));
-  connect(area.y, propsBus_b.area) annotation (Line(points={{11,262},{100.1,262},
+  connect(QTra_desgin.u, propsBus_a.QTra_design) annotation (Line(points={{-12,188},
+          {-100.1,188},{-100.1,0.1}},         color={0,0,127}));
+  connect(QTra_desgin.y, propsBus_b.QTra_design) annotation (Line(points={{11,188},
+          {100.1,188},{100.1,-0.1}},color={0,0,127}));
+  connect(area.u, propsBus_a.area) annotation (Line(points={{-12,160},{-100.1,
+          160},{-100.1,0.1}},color={0,0,127}));
+  connect(area.y, propsBus_b.area) annotation (Line(points={{11,160},{100.1,160},
           {100.1,-0.1}},     color={0,0,127}));
   connect(surfCon.port_a, propsBus_a.surfCon) annotation (Line(points={{-10,72},
           {-100.1,72},{-100.1,0.1}},          color={191,0,0}));
@@ -140,22 +143,22 @@ equation
         points={{10,-160},{100.1,-160},{100.1,-0.1}}, color={0,127,255}));
   connect(massFlowRateMultiplier2.port_b, propsBus_b.port_2) annotation (Line(
         points={{10,-190},{100,-190},{100,-0.1},{100.1,-0.1}}, color={0,127,255}));
-  connect(q50_costume.u, propsBus_a.q50_costume) annotation (Line(points={{-14,
-          236},{-100,236},{-100,0.1},{-100.1,0.1}}, color={255,0,255}));
-  connect(q50_costume.y, propsBus_b.q50_costume) annotation (Line(points={{9,
-          236},{100.1,236},{100.1,-0.1}}, color={255,0,255}));
-  connect(InternalWall.u, propsBus_a.InternalWall) annotation (Line(points={{
-          -16,210},{-100,210},{-100,0.1},{-100.1,0.1}}, color={255,0,255}));
-  connect(InternalWall.y, propsBus_b.InternalWall) annotation (Line(points={{7,
-          210},{100,210},{100,-0.1},{100.1,-0.1}}, color={255,0,255}));
-  connect(q50_zone.y, propsBus_a.q50_zone) annotation (Line(points={{-13,160},{
-          -100,160},{-100,0.1},{-100.1,0.1}}, color={0,0,127}));
-  connect(q50_zone.u, propsBus_b.q50_zone) annotation (Line(points={{10,160},{
-          100,160},{100,-0.1},{100.1,-0.1}}, color={0,0,127}));
-  connect(v50.u, propsBus_a.v50) annotation (Line(points={{-16,186},{-100,186},
+  connect(v50.u, propsBus_a.v50) annotation (Line(points={{-12,-222},{-100,-222},
           {-100,0.1},{-100.1,0.1}}, color={0,0,127}));
-  connect(v50.y, propsBus_b.v50) annotation (Line(points={{7,186},{100,186},{
-          100,-0.1},{100.1,-0.1}}, color={0,0,127}));
+  connect(v50.y, propsBus_b.v50) annotation (Line(points={{11,-222},{100,-222},
+          {100,-0.1},{100.1,-0.1}}, color={0,0,127}));
+  connect(q50_zone.u, propsBus_b.q50_zone) annotation (Line(points={{10,-258},{
+          100,-258},{100,-0.1},{100.1,-0.1}}, color={0,0,127}));
+  connect(q50_zone.y, propsBus_a.q50_zone) annotation (Line(points={{-13,-258},
+          {-100,-258},{-100,0.1},{-100.1,0.1}}, color={0,0,127}));
+  connect(nonCust.u, propsBus_a.nonCust) annotation (Line(points={{-14,-286},{
+          -100,-286},{-100,0.1},{-100.1,0.1}}, color={0,0,127}));
+  connect(nonCust.y, propsBus_b.nonCust) annotation (Line(points={{9,-286},{100,
+          -286},{100,-0.1},{100.1,-0.1}}, color={0,0,127}));
+  connect(n50_cust.u, propsBus_b.n50_cust) annotation (Line(points={{10,-314},{
+          100.1,-314},{100.1,-0.1}}, color={255,0,255}));
+  connect(n50_cust.y, propsBus_a.n50_cust) annotation (Line(points={{-13,-314},
+          {-100,-314},{-100,0.1},{-100.1,0.1}}, color={255,0,255}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-180},
             {100,200}}), graphics={
         Polygon(

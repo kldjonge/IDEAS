@@ -42,16 +42,8 @@ partial model PartialSurface "Partial model for building envelope component"
   replaceable package Medium = IDEAS.Media.Air
     "Medium in the component"
     annotation(Dialog(group="Interzonal airflow (Optional)"));
-
-
-
-  parameter Boolean InternalWall=false "Check if the surface is not connected to outside" annotation(Dialog(tab="Airflow",group="Airtightness"),choices(checkBox=true));
-  parameter Boolean Custom_q50=false "Check if custom q50 value should be used" annotation(Dialog(tab="Airflow",group="Airtightness"),choices(checkBox=true));
-
-  parameter Real q50=setq50.q50
-    "Envelope air tightness"
-    annotation(Dialog(enable = Custom_q50,tab="Airflow",group="Airtightness"));
-
+    parameter Boolean q50_custome=false  annotation (Dialog(group="Interzonal airflow (Optional)"));
+    parameter Real q50=if q50_custome then q50 else Read_q50.q50 "Envelope air tightness" annotation (Dialog(enable=q50_custome,group="Interzonal airflow (Optional)"));
 
   IDEAS.Buildings.Components.Interfaces.ZoneBus propsBus_a(
     redeclare final package Medium = Medium,
@@ -91,35 +83,32 @@ partial model PartialSurface "Partial model for building envelope component"
     final forceErrorControlOnFlow=false,
     m=0.65,
     A=A,
-    final q50=q50) if
+    final q50=Read_q50.q50) if
                   add_cracks and
        sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None
     "Middle or bottom crack "
-    annotation (Placement(transformation(extent={{20,-42},{40,-22}})));
+    annotation (Placement(transformation(extent={{20,-50},{40,-30}})));
   PowerLaw_q50 res2(
   redeclare package Medium = Medium,
     final forceErrorControlOnFlow=false,
     m=0.65,
     A=A,
-    final q50=q50) if
+    final q50=Read_q50.q50) if
                   add_cracks and
        sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts
     "Top crack"
     annotation (Placement(transformation(extent={{20,-70},{40,-50}})));
 
 
-  Setq50_surf setq50(
-    v50=v50,
-    InternalWall=InternalWall,
-    q50_costume=Custom_q50)
+  q50_zone Read_q50(
+    q50_inp=q50,    v50_surf=q50*A, q50_custome=q50_custome)
     annotation (Placement(transformation(extent={{60,-60},{80,-40}})));
+
+
+
 protected
   parameter Boolean add_cracks = true
     "Add cracks";
-
-  Modelica.SIunits.VolumeFlowRate v50=A*q50/3600  "volume flow through this surface at 50pa";
-
-
   final parameter Modelica.SIunits.Angle aziInt=
     if aziOpt==5
     then azi
@@ -166,12 +155,6 @@ protected
     "Block that contributes surface area to the siminfomanager"
     annotation (Placement(transformation(extent={{80,-100},{100,-80}})));
 
-
-
-
-
-
-
 model PowerLaw_q50
 
     extends IDEAS.Airflow.Multizone.BaseClasses.PowerLawResistance(
@@ -186,8 +169,6 @@ model PowerLaw_q50
     "Conversion coefficient";
 equation
   v= V_flow/A;
-
-
   annotation (Icon(graphics={
         Text(
           extent={{-100,100},{-40,60}},
@@ -257,50 +238,54 @@ equation
           fillPattern=FillPattern.Solid)}));
 end PowerLaw_q50;
 
-model Setq50_surf
-  "Block for setting the corrected q50 of the zone and to communicate the v50"
+model q50_zone "Read q_50 from zone"
   extends Modelica.Blocks.Icons.Block;
 
-  parameter Real q50(fixed=false);
 
-  parameter Real v50;
-  parameter Boolean InternalWall;
-  parameter Boolean q50_costume;
+  parameter Real q50_inp;
+  parameter Real v50_surf( unit="m3/h");
+  parameter Boolean q50_custome=false;
 
+  parameter Real q50(fixed=false) annotation(Dialog(enable = false));
 
+  Modelica.Blocks.Interfaces.RealInput q50_zone annotation (Placement(transformation(extent={{-126,50},{-86,90}})));
 
-  Modelica.Blocks.Interfaces.RealInput q50_zone annotation (Placement(transformation(extent={{-122,-86},{-82,-46}}), iconTransformation( extent={{-122,-86},{-82,-46}})));
-
-  Modelica.Blocks.Interfaces.RealOutput v50_int    annotation (Placement(transformation(extent={{-96,-14},{-116,6}})));
-  Modelica.Blocks.Interfaces.BooleanOutput InternalWall_int    annotation (Placement(transformation(extent={{-96,70},{-116,90}})));
-  Modelica.Blocks.Interfaces.BooleanOutput q50_costume_int    annotation (Placement(transformation(extent={{-96,32},{-116,52}})));
+  Modelica.Blocks.Interfaces.RealOutput v50    annotation (Placement(transformation(extent={{-100,
+            -90},{-120,-70}})));
+  Modelica.Blocks.Interfaces.RealOutput nonCust   annotation (Placement(transformation(extent={{-100,-30},{-120,-10}})));
 
 initial equation
 
-  q50=q50_zone;
+  if q50_custome then
+    q50= q50_inp;
+    else
+    q50=q50_zone;
+  end if;
 
 equation
+  v50=v50_surf;
 
-  v50_int=v50;
-  InternalWall_int=InternalWall;
-  q50_costume_int=q50_costume;
+  if q50_custome then
+  nonCust=0;
+  else
+  nonCust=1;
+  end if;
 
 
-
-  annotation (Icon(graphics={Rectangle(extent={{-74,88},{78,-80}}, lineColor={28,
-              108,200}), Ellipse(extent={{-64,68},{60,-56}}, lineColor={28,108,200})}));
-end Setq50_surf;
-
+  annotation (Icon(graphics={Rectangle(
+          extent={{-82,80},{78,-80}},
+          lineColor={28,108,200},
+          fillColor={145,167,175},
+          fillPattern=FillPattern.Forward)}));
+end q50_zone;
 
 
 equation
-
   connect(prescribedHeatFlowE.port, propsBusInt.E);
   connect(Qgai.y,prescribedHeatFlowQgai. Q_flow);
   connect(prescribedHeatFlowQgai.port, propsBusInt.Qgai);
   connect(E.y,prescribedHeatFlowE. E);
   connect(QDesign.y, propsBusInt.QTra_design);
-
   connect(propsBusInt.surfCon, intCon_a.port_b) annotation (Line(
       points={{56.09,19.91},{46,19.91},{46,0},{40,0}},
       color={191,0,0},
@@ -345,21 +330,23 @@ equation
       points={{70,20.2105},{60,20.2105},{60,20},{56,20}},
       color={255,204,51},
       thickness=0.5));
-  connect(res1.port_b, propsBusInt.port_1) annotation (Line(points={{40,-32},{50,
-          -32},{50,19.91},{56.09,19.91}}, color={0,127,255}));
+  connect(res1.port_b, propsBusInt.port_1) annotation (Line(points={{40,-40},{50,
+          -40},{50,19.91},{56.09,19.91}}, color={0,127,255}));
   connect(res2.port_b, propsBusInt.port_2) annotation (Line(points={{40,-60},{50,
           -60},{50,19.91},{56.09,19.91}}, color={0,127,255}));
   connect(setArea.areaPort, sim.areaPort);
-
-  connect(setq50.InternalWall_int, propsBusInt.InternalWall) annotation (Line(
-        points={{59.4,-42},{56,-42},{56,19.91},{56.09,19.91}}, color={255,0,255}));
-  connect(setq50.q50_costume_int, propsBusInt.q50_costume) annotation (Line(
-        points={{59.4,-45.8},{60,-45.8},{60,-46},{56.09,-46},{56.09,19.91}},
-        color={255,0,255}));
-  connect(setq50.v50_int, propsBusInt.v50) annotation (Line(points={{59.4,-50.4},
-          {60,-50.4},{60,-50},{56.09,-50},{56.09,19.91}}, color={0,0,127}));
-  connect(setq50.q50_zone, propsBusInt.q50_zone) annotation (Line(points={{59.8,
-          -56.6},{59.8,-56},{56.09,-56},{56.09,19.91}}, color={0,0,127}));
+  connect(Read_q50.v50, propsBusInt.v50) annotation (Line(points={{59,-58},{56,
+          -58},{56,-20},{56.09,-20},{56.09,19.91}},          color={0,0,127}));
+  connect(Read_q50.q50_zone, propsBusInt.q50_zone) annotation (Line(points={{59.4,
+          -43},{59.4,-44},{56.09,-44},{56.09,19.91}}, color={0,0,127}));
+  connect(Read_q50.v50, setArea.v50) annotation (Line(points={{59,-58},{56,-58},
+          {56,-82},{79.4,-82},{79.4,-83.2}}, color={0,0,127}));
+  connect(Read_q50.nonCust, propsBusInt.nonCust) annotation (Line(points={{59,-52},
+          {56.09,-52},{56.09,19.91}},      color={0,0,127}));
+  connect(Read_q50.nonCust, setArea.nonCust) annotation (Line(points={{59,-52},
+          {56,-52},{56,-88},{79.4,-88},{79.4,-87.4}}, color={0,0,127}));
+  connect(setArea.n50_cust, propsBusInt.n50_cust) annotation (Line(points={{
+          79.4,-91},{79.4,-90.5},{56.09,-90.5},{56.09,19.91}}, color={255,0,255}));
   annotation (
     Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
             100,100}})),

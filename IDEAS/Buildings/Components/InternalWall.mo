@@ -1,14 +1,18 @@
 within IDEAS.Buildings.Components;
 model InternalWall "interior opaque wall between two zones"
   extends IDEAS.Buildings.Components.Interfaces.PartialOpaqueSurface(
+    q50_custome=true,
     q50=2,
     final nWin=1,
-     dT_nominal_a=1,
-  E(y= if sim.computeConservationOfEnergy then layMul.E else 0),
-  Qgai(y=(if sim.openSystemConservationOfEnergy or not sim.computeConservationOfEnergy
-         then 0 else sum(port_emb.Q_flow))),
-  final QTra_design=U_value*A    *(TRef_a - TRef_b),
-    intCon_a);
+    dT_nominal_a=1,
+    E(y=if sim.computeConservationOfEnergy then layMul.E else 0),
+    Qgai(y=(if sim.openSystemConservationOfEnergy or not sim.computeConservationOfEnergy
+           then 0 else sum(port_emb.Q_flow))),
+    final QTra_design=U_value*A*(TRef_a - TRef_b),
+    intCon_a,
+    Read_q50(
+      q50_inp=q50,
+             v50_surf=0, q50_custome=true));
 
   parameter Boolean linIntCon_b=sim.linIntCon
     "= true, if convective heat transfer should be linearised"
@@ -33,7 +37,7 @@ model InternalWall "interior opaque wall between two zones"
   parameter Modelica.SIunits.Acceleration g = Modelica.Constants.g_n
     "Gravity, for computation of buoyancy"
     annotation(Dialog(enable=hasCavity,group="Cavity or open door",tab="Advanced"));
-  parameter Modelica.SIunits.Pressure p = 101300
+  parameter Modelica.SIunits.Pressure p=101300
     "Absolute pressure for computation of buoyancy"
     annotation(Dialog(enable=hasCavity,group="Cavity or open door",tab="Advanced"));
   parameter Modelica.SIunits.Density rho = p/r/T
@@ -42,7 +46,7 @@ model InternalWall "interior opaque wall between two zones"
   parameter Modelica.SIunits.SpecificHeatCapacity c_p = 1013
    "Nominal heat capacity for computation of buoyancy heat flow rate"
    annotation(Dialog(enable=hasCavity,group="Cavity or open door",tab="Advanced"));
-  parameter Modelica.SIunits.Temperature T = 293
+  parameter Modelica.SIunits.Temperature T=293
    "Nominal temperature for linearising heat flow rate"
    annotation(Dialog(enable=hasCavity,group="Cavity or open door",tab="Advanced"));
   parameter Modelica.SIunits.TemperatureDifference dT = 1
@@ -180,6 +184,10 @@ equation
           -40},{-60,20.1},{-100.1,20.1}}, color={0,127,255}));
   connect(res2.port_a, propsBus_b.port_2) annotation (Line(points={{20,-60},{-60,
           -60},{-60,20.1},{-100.1,20.1}}, color={0,127,255}));
+  connect(Read_q50.nonCust, propsBus_b.nonCust) annotation (Line(points={{59,
+          -52},{54,-52},{54,20.1},{-100.1,20.1}}, color={0,0,127}));
+  connect(Read_q50.v50, propsBus_b.v50) annotation (Line(points={{59,-58},{54.6,
+          -58},{54.6,20.1},{-100.1,20.1}}, color={0,0,127}));
   annotation (
     Icon(coordinateSystem(preserveAspectRatio=false,extent={{-60,-100},{60,100}}),
         graphics={
