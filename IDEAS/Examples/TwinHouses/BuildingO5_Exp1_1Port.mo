@@ -8,6 +8,8 @@ model BuildingO5_Exp1_1Port
    redeclare BaseClasses.Ventilation.Vent_TTH_pressureNetwork vent,
     sim(interZonalAirFlowType=IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort, n50=1.64));
 
+  Utilities.Time.CalendarTime calTim(zerTim=IDEAS.Utilities.Time.Types.ZeroTime.NY2014)
+    annotation (Placement(transformation(extent={{40,-80},{60,-60}})));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
     experiment(
