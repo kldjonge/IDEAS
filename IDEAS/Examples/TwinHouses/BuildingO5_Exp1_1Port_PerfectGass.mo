@@ -16,9 +16,9 @@ model BuildingO5_Exp1_1Port_PerfectGass
     experiment(
       StartTime=15000000,
       StopTime=23587200,
-      Interval=600,
+      Interval=10,
       Tolerance=1e-06,
-      __Dymola_Algorithm="Euler"),
+      __Dymola_Algorithm="Cvode"),
     __Dymola_experimentSetupOutput(events=false),
     __Dymola_experimentFlags(
       Advanced(GenerateVariableDependencies=false, OutputModelicaCode=false),
