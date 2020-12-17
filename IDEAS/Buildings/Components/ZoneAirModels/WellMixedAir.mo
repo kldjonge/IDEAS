@@ -98,15 +98,16 @@ protected
     "CO2 sensor"
     annotation (Placement(transformation(extent={{50,-10},{70,-30}})));
 
-  Modelica.SIunits.MassFlowRate m_flow_pos[nPorts];
+  Modelica.SIunits.MassFlowRate m_flow_pos[nPorts+2];
+
 
 equation
 
-  for i in 1:nPorts loop
+  for i in 1:nPorts+2 loop
   m_flow_pos[i]= noEvent(if vol.ports[i].m_flow>0 then vol.ports[i].m_flow else 0);
   end for;
 
-  ACH=(sum(m_flow_pos)*3600/1.2)/Vtot;
+  ACH=(sum(m_flow_pos)*3600/rho_default)/Vtot;
 
   if hasVap then
     assert(vol.ports[1].Xi_outflow[1] <= 0.1,
