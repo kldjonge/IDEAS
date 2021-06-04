@@ -25,13 +25,11 @@ model OuterWall "Opaque building envelope construction"
     annotation(Dialog(group="Building shade",enable=hasBuildingShade));
   final parameter Real U_value=1/(1/8 + sum(constructionType.mats.R) + 1/25)
     "Wall U-value";
-  parameter Real Cs=1
-    "Wind speed modifier"
-    annotation(Dialog(group="Interzonal airflow (Optional)"));
+
   parameter Real coeffsCp[:,:]=[0,0.4; 45,0.1; 90,-0.3; 135,-0.35; 180,-0.2; 225,
       -0.35; 270,-0.3; 315,0.1; 360,0.4]
       "Cp at different angles of attack"
-      annotation(Dialog(group="Interzonal airflow (Optional)"));
+      annotation(Dialog(tab="Airflow", group="Wind Pressure"));
 
   replaceable IDEAS.Buildings.Components.Shading.BuildingShade shaType(
     final L=L,
@@ -45,6 +43,13 @@ model OuterWall "Opaque building envelope construction"
       Dialog(tab="Advanced",group="Shading"));
 
 
+
+  parameter Real Cs=sim.Cs
+                       "Wind speed modifier"
+    annotation (Dialog(tab="Airflow", group="Wind Pressure"));
+  parameter Real Habs=1
+    "Absolute height of boundary for correcting the wind speed"
+    annotation (Dialog(tab="Airflow", group="Wind Pressure"));
 protected
   IDEAS.Buildings.Components.BaseClasses.ConvectiveHeatTransfer.ExteriorConvection
     extCon(
@@ -55,7 +60,7 @@ protected
     "convective surface heat transimission on the exterior side of the wall"
     annotation (Placement(transformation(extent={{-22,-28},{-42,-8}})));
   IDEAS.Buildings.Components.BaseClasses.RadiativeHeatTransfer.ExteriorSolarAbsorption
-    solAbs(A=A)
+    solAbs(A=A, epsSw=layMul.mats[1].epsSw_b)
     "determination of absorbed solar radiation by wall based on incident radiation"
     annotation (Placement(transformation(extent={{-22,-8},{-42,12}})));
   IDEAS.Buildings.Components.BaseClasses.RadiativeHeatTransfer.ExteriorHeatRadiation
@@ -75,7 +80,8 @@ protected
     redeclare package Medium = Medium,
     final table=coeffsCp,
     final azi=aziInt,
-    final Cs=Cs,
+    Cs=Cs,
+    Habs=Habs,
     nPorts=if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort
          then 1 else 2) if
     sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None
@@ -105,10 +111,6 @@ equation
   connect(extRad.port_a, layMul.port_b) annotation (Line(
       points={{-22,22},{-18,22},{-18,0},{-10,0}},
       color={191,0,0},
-      smooth=Smooth.None));
-  connect(layMul.iEpsSw_b,solAbs. epsSw) annotation (Line(
-      points={{-10,4},{-16,4},{-16,8},{-22,8}},
-      color={0,0,127},
       smooth=Smooth.None));
   connect(layMul.iEpsLw_b,extRad. epsLw) annotation (Line(
       points={{-10,8},{-16,8},{-16,25.4},{-22,25.4}},

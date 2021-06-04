@@ -1,7 +1,8 @@
 within IDEAS.Buildings.Components.Interfaces;
 partial model ZoneInterface "Partial model for thermal building zones"
-  replaceable package Medium =
-    Modelica.Media.Interfaces.PartialMedium "Medium in the component"
+  replaceable package Medium = IDEAS.Media.Air
+  constrainedby Modelica.Media.Interfaces.PartialMedium
+    "Medium in the component"
       annotation (choicesAllMatching = true);
   outer IDEAS.BoundaryConditions.SimInfoManager sim
     "Simulation information manager for climate data"
@@ -27,7 +28,7 @@ partial model ZoneInterface "Partial model for thermal building zones"
   //default ACH=2 for ventilation
   parameter Modelica.SIunits.MassFlowRate m_flow_nominal = V * 1.2*2/3600
     "Nominal flow rate of the air flow system fluid ports"
-    annotation(Dialog(tab="Advanced",group="Air model"));
+    annotation(Dialog(tab="Airflow",group="Air model"));
 
     parameter Boolean custome_n50=false "check if custom value for n50 is used" annotation(Dialog(tab="Airflow",group="Zone Airtightness"),choices(checkBox=true));
     parameter Real n50(min=0.01)= sim.n50_cor
@@ -172,6 +173,12 @@ equation
           textString="%name")}),
     Documentation(revisions="<html>
 <ul>
+<li>
+September 17, 2020, Filip Jorissen:<br/>
+Modified default Medium.
+See <a href=\"https://github.com/open-ideas/IDEAS/issues/1169\">#1169</a>.
+March 21, 2019 by Filip Jorissen:<br/>
+</li>
 <li>
 March 17, 2020, Filip Jorissen:<br/>
 Added support for vector fluidport.

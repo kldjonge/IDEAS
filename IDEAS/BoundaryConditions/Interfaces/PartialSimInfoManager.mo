@@ -75,7 +75,7 @@ partial model PartialSimInfoManager
   parameter Modelica.SIunits.Energy Emax=1
     "Error bound for violation of conservation of energy" annotation (Evaluate=true,
       Dialog(tab="Conservation of energy", enable=strictConservationOfEnergy));
-  parameter Modelica.SIunits.Temperature Tenv_nom= 280
+  parameter Modelica.SIunits.Temperature Tenv_nom=280
     "Nominal ambient temperature, only used when linearising equations";
 
   parameter Integer nWindow = 1
@@ -90,11 +90,27 @@ partial model PartialSimInfoManager
 
   parameter IDEAS.BoundaryConditions.Types.InterZonalAirFlow interZonalAirFlowType=
     IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None
-    "Type of interzonal air flow model"
-    annotation(Dialog(group="Interzonal airflow"),Evaluate=true);
+    "Type of interzonal air flow model" annotation(Dialog(group="Interzonal airflow"),Evaluate=true);
+
+  parameter Boolean useN50BuildingComputation=false annotation(choices(checkBox=true),Dialog(enable= if interZonalAirFlowType==
+    IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then true else false,group="Interzonal airflow"));
+
   parameter Real n50 = 0.4
     "n50 value of zones"
-    annotation(Dialog(group="Interzonal airflow"));
+    annotation(Dialog(enable= if interZonalAirFlowType<>
+    IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None or useN50BuildingComputation then true else false,group="Interzonal airflow"));
+
+  parameter Modelica.SIunits.Length H=10 "Building or roof height"
+                                                                  annotation(Dialog(group="Wind"));
+  parameter Real A0=0.6 "Local terrain constant. 0.6 for Suburban,0.35 for Urban and 1 for Unshielded (Ashrae 1993) " annotation(Dialog(group="Wind"));
+  parameter Real a=0.28 "Velocity profile exponent. 0.28 for Suburban, 0.4 for Urban and 0.15 for Unshielded (Ashrae 1993) "
+                                                                                                                            annotation(Dialog(group="Wind"));
+  parameter Modelica.SIunits.Length Hwin=10 "Height above ground of meteorological wind speed measurement"
+                                                                                                          annotation(Dialog(group="Wind"));
+
+  parameter Real Cs= (A0*A0)*((H/Hwin)^(2*a)) "Wind speed modifier"
+                                                                   annotation(Dialog(group="Wind"));
+
 
   final parameter Integer numIncAndAziInBus = size(incAndAziInBus,1)
     "Number of pre-computed azimuth";
@@ -165,15 +181,15 @@ partial model PartialSimInfoManager
     "Concentration of trace substance in surroundings"
     annotation (Placement(transformation(extent={{60,-30},{80,-10}})));
 
-  final parameter Real V_add(unit="m3/h")= V50-V50_custome "additional, not custome volume flowrate";
-  final parameter Real V50(unit="m3/h")=V_tot*n50;
-  final parameter Real q50_cor( unit="m3/(h.m2)") = V_add/A_add_tot;
-  final parameter Real q50_av(  unit="m3/(h.m2)") = V50/A_tot "average, not corrected q50";
+  final parameter Real V50_def(unit="m3/h")= V50-V50_custom "Corrected V50 value, default for surfaces without custom assignment.";
+  final parameter Real V50(unit="m3/h")=V_tot*n50 "V50 value assuming no custom v50 values.";
+  final parameter Real q50_def( unit="m3/(h.m2)") = if A_def< Modelica.Constants.small then q50_av else V50_def/A_def;
+  final parameter Real q50_av(  unit="m3/(h.m2)") = if A_tot < Modelica.Constants.small then 0 else V50/A_tot "average, not corrected q50";
 
-  final parameter Modelica.SIunits.Volume V_tot(fixed=false) "total conditioned building volume";
+  final parameter Modelica.SIunits.Volume V_tot(fixed=false) "Total conditioned building volume";
   final parameter Modelica.SIunits.Area A_tot(fixed=false) "Total surface area of OuterWalls and Windows";
-  final parameter Real V50_custome( unit="m3/h",fixed=false) "Total customely assigned v50 values through components";
-  final parameter Modelica.SIunits.Area A_add_tot( fixed=false) "Total area without customly assigned q50 value or connected to zone with customly assigned n50";
+  final parameter Real V50_custom( unit="m3/h",fixed=false) "Sum of v50 values for components that have a custom assignment";
+  final parameter Modelica.SIunits.Area A_def( fixed=false) "Total area with default q50, i.e. without custom q50 assignment, or connected to zone with custom n50 assigned";
 
   input IDEAS.Buildings.Components.Interfaces.WindowBus[nWindow] winBusOut(
       each nLay=nLayWin) if createOutputs
@@ -247,12 +263,12 @@ protected
     annotation (Placement(transformation(extent={{-86,136},{-78,144}})));
 initial equation
   V_tot=volumePort.V_tot;
-  A_tot=areaPort.A_tot;
-  V50_custome=areaPort.V50_cust;
-  A_add_tot=max(0.001,areaPort.A_add_tot);//else division by 0 error when all surfaces are custome
+  A_tot=max(Modelica.Constants.small,areaPort.A_tot); //max(.,.) to avoid division by 0 error when no surfaces with possible air leakage
+  V50_custom=areaPort.V50_cust;
+  A_def=max(0.001,areaPort.A_def_tot);  //max(.,.) to avoid division by 0 error when all surfaces are custom
 
-  //assert(A_add_tot<=0.001, "All surfaces have lower level custome flows, q50_corr will not be used in simulation",level = AssertionLevel.warning);
-  //assert(A_add_tot>0.001 and V_add<0,  "The total customly assigned volume flow rate at 50pa exceeds the flow at the given building n50 value, q50_cor will be negative",level = AssertionLevel.error);
+  //assert(A_def<0.0011, "All surfaces have lower level custome flows, q50_def will not be used in simulation",level = AssertionLevel.warning);
+  //assert(A_def>0.001 and V50_def<0,  "The total customly assigned volume flow rate at 50pa exceeds the flow at the given building n50 value, q50_cor will be negative",level = AssertionLevel.error);
 
 
   if not linearise and computeConservationOfEnergy then
@@ -263,7 +279,7 @@ equation
   volumePort.V_tot + volumePort.V = 0;
   areaPort.A_tot + areaPort.A = 0;
   areaPort.V50_cust+areaPort.v50=0;
-  areaPort.A_add_tot+areaPort.A_add=0;
+  areaPort.A_def_tot+areaPort.A_def=0;
 
 
   if strictConservationOfEnergy and computeConservationOfEnergy then
