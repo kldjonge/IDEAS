@@ -114,6 +114,10 @@ partial model PartialSimInfoManager
   parameter Real Cs= (A0*A0)*((H/Hwin)^(2*a)) "Wind speed modifier"
                                                                    annotation(Dialog(group="Wind"));
 
+  replaceable parameter Buildings.Data.WindPressureProfiles.AIVC_Table2_2   Cp constrainedby
+    IDEAS.Buildings.Data.Interfaces.WindPressureProfile                                                                                          "Set of wind pressure profiles" annotation (
+    __Dymola_choicesAllMatching=true,Dialog(group="Wind"));
+
 
   final parameter Integer numIncAndAziInBus = size(incAndAziInBus,1)
     "Number of pre-computed azimuth";

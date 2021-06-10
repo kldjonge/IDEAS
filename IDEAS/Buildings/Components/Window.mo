@@ -70,10 +70,7 @@ model Window "Multipane window"
         rotation=-90,
         origin={-40,-100})));
 
-
-
-  parameter Real coeffsCp[:,:]=[0,0.4; 45,0.1; 90,-0.3; 135,-0.35; 180,-0.2; 225,
-      -0.35; 270,-0.3; 315,0.1; 360,0.4]
+    parameter Real coeffsCp[:,:] = if inc> Modelica.Constants.D2R*60 then sim.Cp.Wall elseif inc>Modelica.Constants.D2R*30 then sim.Cp.Roof_30 elseif inc>Modelica.Constants.D2R*10 then sim.Cp.Roof_10 else sim.Cp.Roof_10
       "Cp at different angles of attack"
       annotation(Dialog(tab="Airflow",group="Wind"));
   parameter Real Cs=sim.Cs
