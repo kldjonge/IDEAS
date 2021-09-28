@@ -20,5 +20,7 @@ annotation (
 This Modelica package is <u>free</u> software and the use is completely at <u>your own risk</u>;
 For license information, view our <a href=\"https://github.com/open-ideas/IDEAS\">github page</a>.
 </p>
-</html>"));
+</html>"),           __Dymola_Commands(file=
+          "Resources/Scripts/Dymola/Buildings/Examples/ZoneExample.mos"
+        "Simulate and plot"));
 end IDEAS;
