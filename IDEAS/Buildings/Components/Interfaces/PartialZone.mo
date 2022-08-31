@@ -193,7 +193,7 @@ protected
   parameter Real n50_int(unit="1/h",min=0.01,fixed= false)
     "n50 value cfr airtightness, i.e. the ACH at a pressure diffence of 50 Pa"
     annotation(Dialog(enable=use_custom_n50,tab="Airflow", group="Airtightness"));
-  parameter Integer n_ports_interzonal(fixed=false)
+  parameter Integer n_ports_interzonal=setq50.nPorts_surf_tot
       "Number of fluid ports for interzonal air flow modelling"
       annotation(Evaluate=true);
    /* if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then 0
@@ -263,6 +263,9 @@ model Setq50 "q50 computation for zones"
   parameter Modelica.Units.SI.Length hZone "Zone height: distance between floor and ceiling";
   parameter Modelica.Units.SI.Length hFloor = 0  "Absolute height of zone floor";
 
+  parameter Integer nPorts_surf_tot;
+  Integer nports_surf_tot;
+
   Modelica.Blocks.Interfaces.RealInput v50_surf[nSurf]
    annotation (Placement(transformation(extent={{-126,28},{-86,68}})));
   Modelica.Blocks.Interfaces.BooleanInput use_custom_q50[nSurf]
@@ -283,16 +286,21 @@ model Setq50 "q50 computation for zones"
   Modelica.Blocks.Interfaces.RealOutput hfloor[nSurf]
     "Custom q50 value for the surfaces connected to this zone"
     annotation (Placement(transformation(extent={{-96,-106},{-116,-86}})));
+  Modelica.Blocks.Interfaces.IntegerInput nports_surf[nSurf]
+    annotation (Placement(transformation(extent={{-126,-28},{-86,12}})));
 initial equation
 
   for i in 1:nSurf loop
     defaultArea[i] = if use_custom_q50[i] then 0 else Area[i];
     v50_custom[i] = if use_custom_q50[i] then v50_surf[i] else 0;
+    nPorts_surf_tot=nports_surf_tot;
 
   end for;
   allSurfacesCustom = max(Modelica.Constants.small, sum(defaultArea)) <= Modelica.Constants.small;
 
 equation
+  nports_surf_tot+sum(nports_surf)=0;
+
   use_custom_n50s=fill(use_custom_n50,nSurf);
 
   if use_custom_n50 then
@@ -321,7 +329,7 @@ initial equation
   n50_int = if use_custom_n50 and not setq50.allSurfacesCustom then n50 else sum(propsBusInt.v50)/V;
 
   Q_design=QInf_design+QRH_design+QTra_design; //Total design load for zone (additional ventilation losses are calculated in the ventilation system)
-  n_ports_interzonal=sum(propsBusInt.nports_surf);
+
 
 equation
   if interzonalAirFlow.verifyBothPortsConnected then
@@ -528,6 +536,8 @@ end for;
           -97.2},{-60.6,-97.8},{-80.1,-97.8},{-80.1,39.9}}, color={0,0,127}));
   connect(setq50.hfloor, propsBusInt.hfloor) annotation (Line(points={{-60.6,
           -99.6},{-60.6,-99.8},{-80.1,-99.8},{-80.1,39.9}}, color={0,0,127}));
+  connect(setq50.nports_surf, propsBusInt.nports_surf) annotation (Line(points={
+          {-60.6,-90.8},{-80.1,-90.8},{-80.1,39.9}}, color={255,127,0}));
   annotation (Placement(transformation(extent={{
             140,48},{100,88}})),
     Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
