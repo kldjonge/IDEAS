@@ -62,6 +62,7 @@ partial model PartialSurface "Partial model for building envelope component"
 
   IDEAS.Buildings.Components.Interfaces.ZoneBus propsBus_a(
     redeclare final package Medium = Medium,
+    nPorts_surf=propsBusInt.nPorts_surf,
     numIncAndAziInBus=sim.numIncAndAziInBus, outputAngles=sim.outputAngles,
     final use_port_1=sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None,
     final use_port_2=sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts)
@@ -152,13 +153,15 @@ protected
     "Component for computing conservation of energy";
 
   IDEAS.Buildings.Components.Interfaces.ZoneBusVarMultiplicator gain(redeclare
-      package Medium = Medium,                                       k=nWin)
+      package Medium = Medium,
+    nPorts_surf=propsBusInt.nPorts_surf,                             k=nWin)
     "Gain for all propsBus variable to represent nWin surfaces instead of 1"
     annotation (Placement(transformation(extent={{70,6},{88,36}})));
   IDEAS.Buildings.Components.Interfaces.ZoneBus propsBusInt(
     redeclare final package Medium = Medium,
     numIncAndAziInBus=sim.numIncAndAziInBus,
     outputAngles=sim.outputAngles,
+    nPorts_surf=if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then 0 elseif sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort then 1 else 2,
     final use_port_1=sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None,
     final use_port_2=sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts)
     annotation (Placement(transformation(
@@ -417,10 +420,6 @@ equation
       points={{70,20.2105},{60,20.2105},{60,20},{56,20}},
       color={255,204,51},
       thickness=0.5));
-  connect(res1.port_b, propsBusInt.port_1) annotation (Line(points={{40,-36},{50,
-          -36},{50,19.91},{56.09,19.91}}, color={0,127,255}));
-  connect(res2.port_b, propsBusInt.port_2) annotation (Line(points={{40,-60},{50,
-          -60},{50,19.91},{56.09,19.91}}, color={0,127,255}));
   connect(setArea.areaPort, sim.areaPort);
   connect(q50_zone.v50, propsBusInt.v50) annotation (Line(points={{79,-58},{56,-58},
           {56,-20},{56.09,-20},{56.09,19.91}},               color={0,0,127}));
@@ -436,6 +435,14 @@ equation
           -47.6},{80,-47.6},{80,-48},{56.09,-48},{56.09,19.91}}, color={0,0,127}));
   connect(q50_zone.dummy_h[2], propsBusInt.hfloor) annotation (Line(points={{79.4,
           -45.6},{80,-45.6},{80,-46},{56.09,-46},{56.09,19.91}}, color={0,0,127}));
+
+  connect(res1.port_b, propsBusInt.port[1]) annotation (Line(points={{40,-36},{54,
+          -36},{54,-4},{56.09,-4},{56.09,19.91}}, color={0,127,255}));
+          //first is middle or bottom crack
+  connect(res2.port_b, propsBusInt.port[2]) annotation (Line(points={{40,-60},{54,
+          -60},{54,-4},{56.09,-4},{56.09,19.91}},
+                                         color={0,127,255}));
+          //second is top crack OR additional port
   annotation (
     Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
             100,100}})),

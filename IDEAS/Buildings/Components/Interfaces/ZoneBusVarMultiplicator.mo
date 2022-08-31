@@ -4,10 +4,12 @@ model ZoneBusVarMultiplicator "Component to scale all flows from the zone propsB
     Modelica.Media.Interfaces.PartialMedium
     "Medium in the component";
   parameter Real k = 1 "Scaling factor";
+  parameter Integer nPorts_surf=0;
 
   ZoneBus propsBus_a(
     redeclare final package Medium = Medium,
     numIncAndAziInBus=sim.numIncAndAziInBus, outputAngles=sim.outputAngles,
+    nPorts_surf=nPorts_surf,
     final use_port_1=sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None,
     final use_port_2=sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts)
     "Unscaled port"                                                         annotation (Placement(transformation(
@@ -18,6 +20,7 @@ model ZoneBusVarMultiplicator "Component to scale all flows from the zone propsB
   ZoneBus propsBus_b(
     redeclare final package Medium = Medium,
     numIncAndAziInBus=sim.numIncAndAziInBus, outputAngles=sim.outputAngles,
+    nPorts_surf=nPorts_surf,
     final use_port_1=sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None,
     final use_port_2=sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts)
     "Scaled port"                                                           annotation (Placement(transformation(
@@ -31,16 +34,12 @@ model ZoneBusVarMultiplicator "Component to scale all flows from the zone propsB
   Modelica.Blocks.Routing.BooleanPassThrough use_custom_n50
     annotation (Placement(transformation(extent={{8,-324},{-12,-304}})));
 protected
-  IDEAS.Fluid.BaseClasses.MassFlowRateMultiplier massFlowRateMultiplier2(
+  IDEAS.Fluid.BaseClasses.MassFlowRateMultiplier[nPorts_surf] massFlowRateMultiplier2(
       redeclare package Medium = Medium,                                 final k=k)
-    if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts
-    "Mass flow rate multiplier for port 2"
+    if nPorts_surf>0
+    "Mass flow rate multiplier for fluidports"
     annotation (Placement(transformation(extent={{-10,-200},{10,-180}})));
-  IDEAS.Fluid.BaseClasses.MassFlowRateMultiplier massFlowRateMultiplier1(
-      redeclare package Medium = Medium,                                 final k=k)
-     if sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None
-    "Mass flow rate multiplier for port 1"
-    annotation (Placement(transformation(extent={{-10,-170},{10,-150}})));
+
   Modelica.Blocks.Math.Gain QTra_desgin(k=k) "Design heat flow rate"
     annotation (Placement(transformation(extent={{-10,178},{10,198}})));
   Modelica.Blocks.Math.Gain area(k=k) "Heat exchange surface area"
@@ -140,14 +139,6 @@ equation
           128},{100.1,-0.1}},        color={0,0,127}));
   connect(epsSw.y, propsBus_b.epsSw) annotation (Line(points={{11,98},{100.1,98},
           {100.1,-0.1}}, color={0,0,127}));
-  connect(massFlowRateMultiplier1.port_a, propsBus_a.port_1) annotation (Line(
-        points={{-10,-160},{-100.1,-160},{-100.1,0.1}}, color={0,127,255}));
-  connect(massFlowRateMultiplier2.port_a, propsBus_a.port_2) annotation (Line(
-        points={{-10,-190},{-100.1,-190},{-100.1,0.1}}, color={0,127,255}));
-  connect(massFlowRateMultiplier1.port_b, propsBus_b.port_1) annotation (Line(
-        points={{10,-160},{100.1,-160},{100.1,-0.1}}, color={0,127,255}));
-  connect(massFlowRateMultiplier2.port_b, propsBus_b.port_2) annotation (Line(
-        points={{10,-190},{100,-190},{100,-0.1},{100.1,-0.1}}, color={0,127,255}));
   connect(v50.u, propsBus_a.v50) annotation (Line(points={{-12,-222},{-100,-222},
           {-100,0.1},{-100.1,0.1}}, color={0,0,127}));
   connect(v50.y, propsBus_b.v50) annotation (Line(points={{11,-222},{100,-222},
@@ -175,6 +166,10 @@ equation
           -374},{100,-0.1},{100.1,-0.1}}, color={0,0,127}));
   connect(hFloor.y, propsBus_a.hfloor) annotation (Line(points={{-13,-374},{
           -100,-374},{-100,0.1},{-100.1,0.1}}, color={0,0,127}));
+  connect(massFlowRateMultiplier2.port_a, propsBus_a.port) annotation (Line(
+        points={{-10,-190},{-100.1,-190},{-100.1,0.1}}, color={0,127,255}));
+  connect(massFlowRateMultiplier2.port_b, propsBus_b.port) annotation (Line(
+        points={{10,-190},{100.1,-190},{100.1,-0.1}}, color={0,127,255}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-180},
             {100,200}}), graphics={
         Polygon(

@@ -57,6 +57,7 @@ model InternalWall "interior opaque wall between two zones"
     redeclare final package Medium = Medium,
     numIncAndAziInBus=sim.numIncAndAziInBus,
     outputAngles=sim.outputAngles,
+    nPorts_surf=propsBusInt.nPorts_surf,
     final use_port_1=sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None,
     final use_port_2=sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts)
                                    "If inc = Floor, then propsbus_b should be connected to the zone below this floor.
@@ -200,28 +201,30 @@ equation
   connect(theConDoor.port_b, propsBusInt.surfCon) annotation (Line(points={{10,40},
           {46,40},{46,19.91},{56.09,19.91}},
                                            color={191,0,0}));
-  connect(dooOpe.port_a2, propsBusInt.port_1) annotation (Line(points={{10,86},{
-          38,86},{38,19.91},{56.09,19.91}}, color={0,127,255}));
-  connect(dooOpe.port_b1, propsBusInt.port_2) annotation (Line(points={{10,98},{
-          42,98},{42,19.91},{56.09,19.91}}, color={0,127,255}));
-  connect(dooOpe.port_a1, propsBus_b.port_2) annotation (Line(points={{-10,98},{
-          -42,98},{-42,20.1},{-100.1,20.1}}, color={0,127,255}));
-  connect(dooOpe.port_b2, propsBus_b.port_1) annotation (Line(points={{-10,86},{
-          -38,86},{-38,20.1},{-100.1,20.1}}, color={0,127,255}));
-  connect(res1.port_a, propsBus_b.port_1) annotation (Line(points={{20,-36},{-60,
-          -36},{-60,20.1},{-100.1,20.1}}, color={0,127,255}));
-  connect(res2.port_a, propsBus_b.port_2) annotation (Line(points={{20,-60},{-60,
-          -60},{-60,20.1},{-100.1,20.1}}, color={0,127,255}));
+  connect(dooOpe.port_a2, propsBusInt.port[1]) annotation (Line(points={{10,86},
+          {38,86},{38,19.91},{56.09,19.91}},color={0,127,255}));
+  connect(dooOpe.port_b1, propsBusInt.port[2]) annotation (Line(points={{10,98},
+          {42,98},{42,19.91},{56.09,19.91}},color={0,127,255}));
+  connect(dooOpe.port_a1, propsBus_b.port[2]) annotation (Line(points={{-10,98},
+          {-42,98},{-42,20.1},{-100.1,20.1}},color={0,127,255}));
+  connect(dooOpe.port_b2, propsBus_b.port[1]) annotation (Line(points={{-10,86},
+          {-38,86},{-38,20.1},{-100.1,20.1}},color={0,127,255}));
+  connect(res1.port_a, propsBus_b.port[1]) annotation (Line(points={{20,-36},{
+          -60,-36},{-60,20.1},{-100.1,20.1}},
+                                          color={0,127,255}));
+  connect(res2.port_a, propsBus_b.port[2]) annotation (Line(points={{20,-60},{
+          -60,-60},{-60,20.1},{-100.1,20.1}},
+                                          color={0,127,255}));
   connect(q50_zone.v50, propsBus_b.v50) annotation (Line(points={{79,-58},{56,
           -58},{56,20.1},{-100.1,20.1}},   color={0,0,127}));
   connect(q50_zone.using_custom_q50, propsBus_b.use_custom_q50) annotation (Line(points={{79,-52},
           {56,-52},{56,20.1},{-100.1,20.1}},      color={0,0,127}));
 
-  connect(col_b_pos.port_b, propsBus_b.port_1) annotation (Line(points={{-30,42},
+  connect(col_b_pos.port_b, propsBus_b.port[1]) annotation (Line(points={{-30,42},
           {-30,20},{-44,20},{-44,20.1},{-100.1,20.1}}, color={0,127,255}));
   connect(col_b_pos.port_a, resDoor.port_a)
     annotation (Line(points={{-30,62},{-30,68},{-10,68}}, color={0,127,255}));
-  connect(col_a_pos.port_b, propsBusInt.port_1) annotation (Line(points={{26,42},
+  connect(col_a_pos.port_b, propsBusInt.port[1]) annotation (Line(points={{26,42},
           {26,19.91},{56.09,19.91}}, color={0,127,255}));
   connect(col_a_pos.port_a, resDoor.port_b)
     annotation (Line(points={{26,62},{26,68},{10,68}}, color={0,127,255}));

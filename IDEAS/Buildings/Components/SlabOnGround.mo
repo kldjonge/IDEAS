@@ -113,9 +113,9 @@ equation
       index=1,
       extent={{6,3},{6,3}},
       horizontalAlignment=TextAlignment.Left));
-  connect(boundary1.ports[1], propsBusInt.port_1) annotation (Line(points={{-8,-30},
+  connect(boundary1.ports[1], propsBusInt.port[1]) annotation (Line(points={{-8,-30},
           {42,-30},{42,19.91},{56.09,19.91}}, color={0,127,255}));
-  connect(boundary2.ports[1], propsBusInt.port_2) annotation (Line(points={{-8,-66},
+  connect(boundary2.ports[1], propsBusInt.port[2]) annotation (Line(points={{-8,-66},
           {44,-66},{44,19.91},{56.09,19.91}},                   color={0,127,255}));
   annotation (
     Icon(coordinateSystem(preserveAspectRatio=true, extent={{-60,-100},{60,100}}),

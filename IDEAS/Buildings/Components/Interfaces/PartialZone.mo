@@ -203,6 +203,9 @@ protected
     redeclare each final package Medium = Medium,
     each final numIncAndAziInBus=sim.numIncAndAziInBus,
     each final outputAngles=sim.outputAngles,
+    nPorts_surf=if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None
+         then 0 elseif sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort
+         then 1 else 2,
     each final use_port_1=sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None,
     each final use_port_2=sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts)
     "Dummy propsbus for partial" annotation (Placement(transformation(
@@ -499,12 +502,12 @@ end for;
   connect(interzonalAirFlow.portsExt, ports) annotation (Line(points={{-30,80},{
           -30,90},{0,90},{0,100}}, color={0,127,255}));
   if sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then
-    connect(airModel.ports[interzonalAirFlow.nPorts + 1:interzonalAirFlow.nPorts + nSurf], propsBusInt[1:nSurf].port_1) annotation (Line(points={{-30,
-          40},{-30,39.9},{-80.1,39.9}}, color={0,127,255}));
+    connect(airModel.ports[interzonalAirFlow.nPorts + 1:interzonalAirFlow.nPorts + nSurf], propsBusInt[1:nSurf].port[1]) annotation (Line(points={{-30,40},
+            {-30,39.9},{-80.1,39.9}},   color={0,127,255}));
   end if;
   if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts then
-    connect(airModel.ports[interzonalAirFlow.nPorts + 1 + nSurf:interzonalAirFlow.nPorts + nSurf*2], propsBusInt[1:nSurf].port_2) annotation (Line(points={{-30,
-          40},{-30,39.9},{-80.1,39.9}}, color={0,127,255}));
+    connect(airModel.ports[interzonalAirFlow.nPorts + 1 + nSurf:interzonalAirFlow.nPorts + nSurf*2], propsBusInt[1:nSurf].port[2]) annotation (Line(points={{-30,40},
+            {-30,39.9},{-80.1,39.9}},   color={0,127,255}));
   end if;
   connect(setq50.Area, propsBusInt.area) annotation (Line(points={{-60.6,-88.6},
           {-60.6,-89.3},{-80.1,-89.3},{-80.1,39.9}}, color={0,0,127}));

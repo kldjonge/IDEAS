@@ -279,8 +279,8 @@ equation
     Line(points = {{20, -60}, {16, -60}, {16, -90}, {-20, -90}}, color = {0, 127, 255}));
   connect(trickleVent.port_a, outsideAir.ports[if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort then 2 else 3]) annotation (
     Line(points = {{20, -78}, {16, -78}, {16, -92}, {-2, -92}, {-2, -90}, {-20, -90}}, color = {0, 127, 255}));
-  connect(trickleVent.port_b, propsBusInt.port_1) annotation (
-    Line(points = {{40, -78}, {50, -78}, {50, 19.91}, {56.09, 19.91}}, color = {0, 127, 255}));
+  connect(trickleVent.port_b, propsBusInt.port[1]) annotation (
+    Line(points={{40,-78},{50,-78},{50,19.91},{56.09,19.91}},          color = {0, 127, 255}));
   connect(radSolData.Te, shaType.Te) annotation (
     Line(points={{-79.4,-64},{-68.5,-64},{-68.5,-29.9067}}, color = {0, 0, 127}));
   connect(shaType.port_frame, layFra.port_b) annotation (

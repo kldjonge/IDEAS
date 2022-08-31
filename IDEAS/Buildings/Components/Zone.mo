@@ -7,6 +7,7 @@ model Zone "Building zone model"
     redeclare each final package Medium = Medium,
     each final numIncAndAziInBus=sim.numIncAndAziInBus,
     each final outputAngles=sim.outputAngles,
+    nPorts_surf=propsBusInt.nPorts_surf,
     each final use_port_1=sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None,
     each final use_port_2=sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts)
                           annotation (Placement(transformation(
