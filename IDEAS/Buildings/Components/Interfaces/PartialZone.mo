@@ -193,12 +193,13 @@ protected
   parameter Real n50_int(unit="1/h",min=0.01,fixed= false)
     "n50 value cfr airtightness, i.e. the ACH at a pressure diffence of 50 Pa"
     annotation(Dialog(enable=use_custom_n50,tab="Airflow", group="Airtightness"));
-  parameter Integer n_ports_interzonal=
-    if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then 0
-    elseif sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort then nSurf
-    else nSurf*2
+  parameter Integer n_ports_interzonal(fixed=false)
       "Number of fluid ports for interzonal air flow modelling"
       annotation(Evaluate=true);
+   /* if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then 0
+    elseif sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort then nSurf
+    else nSurf*2
+   */
   IDEAS.Buildings.Components.Interfaces.ZoneBus[nSurf] propsBusInt(
     redeclare each final package Medium = Medium,
     each final numIncAndAziInBus=sim.numIncAndAziInBus,
@@ -320,6 +321,7 @@ initial equation
   n50_int = if use_custom_n50 and not setq50.allSurfacesCustom then n50 else sum(propsBusInt.v50)/V;
 
   Q_design=QInf_design+QRH_design+QTra_design; //Total design load for zone (additional ventilation losses are calculated in the ventilation system)
+  n_ports_interzonal=sum(propsBusInt.nports_surf);
 
 equation
   if interzonalAirFlow.verifyBothPortsConnected then
