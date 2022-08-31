@@ -16,5 +16,6 @@ ZoneBusVarMultiplicator
 ZoneInterface
 VolumePort
 AreaPort
+nPortsurfPort
 SetVolume
 SetArea

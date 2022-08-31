@@ -362,9 +362,12 @@ model Q50_parameterToConnector "Converts parameter values into connectors for pr
   Modelica.Blocks.Interfaces.RealInput dummy_h[2]
       "Dummy connectors for hzone and hfloor"
       annotation (Placement(transformation(extent={{-126,14},{-86,54}})));
-  Modelica.Blocks.Interfaces.IntegerOutput nports_surf=nPorts_surf
+  nPortsurfPort   nports_surf
     "number of fluidports in the surface bus"
    annotation (Placement(transformation(extent={{-100,-58},{-120,-38}})));
+equation
+  nports_surf.nPort_surf=nPorts_surf;
+
   annotation (Icon(graphics={Rectangle(
           extent={{-82,80},{78,-80}},
           lineColor={28,108,200},
@@ -449,7 +452,7 @@ equation
                                          color={0,127,255}));
           //second is top crack OR additional port
   connect(q50_zone.nports_surf, propsBusInt.nports_surf) annotation (Line(
-        points={{79,-54.8},{56.09,-54.8},{56.09,19.91}}, color={255,127,0}));
+        points={{79,-54.8},{56.09,-54.8},{56.09,19.91}}, color={0,0,0}));
   annotation (
     Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
             100,100}})),

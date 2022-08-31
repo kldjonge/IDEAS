@@ -264,7 +264,6 @@ model Setq50 "q50 computation for zones"
   parameter Modelica.Units.SI.Length hFloor = 0  "Absolute height of zone floor";
 
   parameter Integer nPorts_surf_tot;
-  Integer nports_surf_tot;
 
   Modelica.Blocks.Interfaces.RealInput v50_surf[nSurf]
    annotation (Placement(transformation(extent={{-126,28},{-86,68}})));
@@ -286,20 +285,23 @@ model Setq50 "q50 computation for zones"
   Modelica.Blocks.Interfaces.RealOutput hfloor[nSurf]
     "Custom q50 value for the surfaces connected to this zone"
     annotation (Placement(transformation(extent={{-96,-106},{-116,-86}})));
-  Modelica.Blocks.Interfaces.IntegerInput nports_surf[nSurf]
-    annotation (Placement(transformation(extent={{-126,-28},{-86,12}})));
+  nPortsurfPort  nports_surf[nSurf]
+    annotation (Placement(transformation(extent={{-110,-18},{-92,0}}),
+        iconTransformation(extent={{-110,-18},{-92,0}})));
+  nPortsurfPort nPortsurfPort_int
+    annotation (Placement(transformation(extent={{-60,-20},{-40,0}})));
 initial equation
 
   for i in 1:nSurf loop
     defaultArea[i] = if use_custom_q50[i] then 0 else Area[i];
     v50_custom[i] = if use_custom_q50[i] then v50_surf[i] else 0;
-    nPorts_surf_tot=nports_surf_tot;
 
   end for;
   allSurfacesCustom = max(Modelica.Constants.small, sum(defaultArea)) <= Modelica.Constants.small;
+  nPorts_surf_tot=nPortsurfPort_int.nPort_surf_tot;
 
 equation
-  nports_surf_tot+sum(nports_surf)=0;
+  nPortsurfPort_int.nPort_surf_tot+nPortsurfPort_int.nPort_surf=0;
 
   use_custom_n50s=fill(use_custom_n50,nSurf);
 
@@ -314,6 +316,13 @@ equation
 
 
 
+for i in 1:nSurf loop
+  connect(nports_surf[i], nPortsurfPort_int) annotation (Line(points={{-101,-9},
+              {-64,-9},{-64,-10},{-50,-10}},
+                                         color={0,0,0}));
+end for;
+    connect(nPortsurfPort_int, nPortsurfPort_int)
+      annotation (Line(points={{-50,-10},{-50,-10}}, color={0,0,0}));
     annotation (Icon(graphics={Rectangle(
             extent={{-84,80},{82,-80}},
             lineColor={28,108,200},
@@ -536,8 +545,8 @@ end for;
           -97.2},{-60.6,-97.8},{-80.1,-97.8},{-80.1,39.9}}, color={0,0,127}));
   connect(setq50.hfloor, propsBusInt.hfloor) annotation (Line(points={{-60.6,
           -99.6},{-60.6,-99.8},{-80.1,-99.8},{-80.1,39.9}}, color={0,0,127}));
-  connect(setq50.nports_surf, propsBusInt.nports_surf) annotation (Line(points={
-          {-60.6,-90.8},{-80.1,-90.8},{-80.1,39.9}}, color={255,127,0}));
+  connect(setq50.nports_surf, propsBusInt.nports_surf) annotation (Line(points=
+          {{-60.1,-90.9},{-80.1,-90.9},{-80.1,39.9}}, color={0,0,0}));
   annotation (Placement(transformation(extent={{
             140,48},{100,88}})),
     Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
