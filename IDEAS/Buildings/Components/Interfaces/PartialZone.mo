@@ -341,7 +341,7 @@ end for;
       color={191,0,0},
       smooth=Smooth.None));
   connect(radDistr.TRad, add.u[1]) annotation (Line(
-      points={{-40,-50},{-6,-50},{-6,19.7},{82.8,19.7}},
+      points={{-40,-50},{-6,-50},{-6,19.4},{82.8,19.4}},
       color={0,0,127},
       smooth=Smooth.None));
   connect(propsBusInt[1:nSurf].area, radDistr.area[1:nSurf]) annotation (Line(
@@ -444,8 +444,9 @@ end for;
           0,127}));
   connect(airModel.ports_air[1], gainCon) annotation (Line(points={{-20,30},{2,30},
           {2,-30},{100,-30}}, color={191,0,0}));
-  connect(airModel.TAir, add.u[2]) annotation (Line(points={{-19,24},{-10,24},{-10,
-          20.3},{82.8,20.3}},  color={0,0,127}));
+  connect(airModel.TAir, add.u[2]) annotation (Line(points={{-19,24},{-10,24},{
+          -10,20.6},{82.8,20.6}},
+                               color={0,0,127}));
   connect(radDistr.azi[1:nSurf], propsBusInt[1:nSurf].azi) annotation (Line(
         points={{-60,-42},{-70,-42},{-80,-42},{-80,39.9},{-80.1,39.9}}, color={
           0,0,127}), Text(

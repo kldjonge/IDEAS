@@ -48,7 +48,7 @@ connector ZoneBus
   IDEAS.Buildings.Components.Interfaces.BooleanConnector use_custom_n50 "true if the zone n50 is a custom value" annotation ();
   IDEAS.Buildings.Components.Interfaces.RealConnector hzone(final unit="m") "Zone height: distance between floor and ceiling" annotation ();
   IDEAS.Buildings.Components.Interfaces.RealConnector hfloor(final unit="m") "Absolute height of zone floor" annotation ();
-
+  IDEAS.Buildings.Components.Interfaces.IntegerConnector nports_surf "The amount of fluidports the surface needs, used to communicate this to the zone" annotation ();
 
   annotation (Documentation(info="<html>
 <p>

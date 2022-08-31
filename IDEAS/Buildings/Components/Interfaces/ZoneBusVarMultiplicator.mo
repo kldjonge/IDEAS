@@ -33,6 +33,8 @@ model ZoneBusVarMultiplicator "Component to scale all flows from the zone propsB
     annotation (Placement(transformation(extent={{72,122},{92,142}})));
   Modelica.Blocks.Routing.BooleanPassThrough use_custom_n50
     annotation (Placement(transformation(extent={{8,-324},{-12,-304}})));
+  Modelica.Blocks.Routing.IntegerPassThrough nports_surf
+    annotation (Placement(transformation(extent={{-10,-172},{10,-152}})));
 protected
   IDEAS.Fluid.BaseClasses.MassFlowRateMultiplier[nPorts_surf] massFlowRateMultiplier2(
       redeclare package Medium = Medium,                                 final k=k)
@@ -170,6 +172,10 @@ equation
         points={{-10,-190},{-100.1,-190},{-100.1,0.1}}, color={0,127,255}));
   connect(massFlowRateMultiplier2.port_b, propsBus_b.port) annotation (Line(
         points={{10,-190},{100.1,-190},{100.1,-0.1}}, color={0,127,255}));
+  connect(nports_surf.u, propsBus_a.nports_surf) annotation (Line(points={{-12,
+          -162},{-100,-162},{-100,0.1},{-100.1,0.1}}, color={255,127,0}));
+  connect(nports_surf.y, propsBus_b.nports_surf) annotation (Line(points={{11,
+          -162},{100,-162},{100,-0.1},{100.1,-0.1}}, color={255,127,0}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-180},
             {100,200}}), graphics={
         Polygon(

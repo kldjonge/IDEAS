@@ -106,8 +106,8 @@ partial model PartialSurface "Partial model for building envelope component"
 
 
   PowerLaw_q50_stack res2(
-  redeclare package
-  Medium = Medium,
+  redeclare package Medium =
+           Medium,
     A=A/2,
   h_b= -0.5*hzone_a + 0.75*hVertical +hRef_a,
     final q50=q50_internal)
@@ -119,7 +119,8 @@ partial model PartialSurface "Partial model for building envelope component"
   Q50_parameterToConnector q50_zone(
     q50_inp=q50_internal,
     v50_surf=q50_internal*A,
-    use_custom_q50=use_custom_q50)
+    use_custom_q50=use_custom_q50,
+    nPorts_surf=propsBusInt.nPorts_surf)
     annotation (Placement(transformation(extent={{80,-60},{100,-40}})));
 
 
@@ -347,6 +348,7 @@ model Q50_parameterToConnector "Converts parameter values into connectors for pr
     "Custom v50 value";
   parameter Boolean use_custom_q50=false
     "true if custom q50 value should be considered by the zone";
+  parameter Integer nPorts_surf;
   Modelica.Blocks.Interfaces.RealInput q50_zone
     "Input for q50 value computed by the zone"
    annotation (Placement(transformation(extent={{-126,50},{-86,90}})));
@@ -360,6 +362,9 @@ model Q50_parameterToConnector "Converts parameter values into connectors for pr
   Modelica.Blocks.Interfaces.RealInput dummy_h[2]
       "Dummy connectors for hzone and hfloor"
       annotation (Placement(transformation(extent={{-126,14},{-86,54}})));
+  Modelica.Blocks.Interfaces.IntegerOutput nports_surf=nPorts_surf
+    "number of fluidports in the surface bus"
+   annotation (Placement(transformation(extent={{-100,-58},{-120,-38}})));
   annotation (Icon(graphics={Rectangle(
           extent={{-82,80},{78,-80}},
           lineColor={28,108,200},
@@ -443,6 +448,8 @@ equation
           -60},{54,-4},{56.09,-4},{56.09,19.91}},
                                          color={0,127,255}));
           //second is top crack OR additional port
+  connect(q50_zone.nports_surf, propsBusInt.nports_surf) annotation (Line(
+        points={{79,-54.8},{56.09,-54.8},{56.09,19.91}}, color={255,127,0}));
   annotation (
     Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
             100,100}})),

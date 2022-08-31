@@ -228,6 +228,9 @@ equation
           {26,19.91},{56.09,19.91}}, color={0,127,255}));
   connect(col_a_pos.port_a, resDoor.port_b)
     annotation (Line(points={{26,62},{26,68},{10,68}}, color={0,127,255}));
+  connect(q50_zone.nports_surf, propsBus_b.nports_surf) annotation (Line(points
+        ={{79,-54.8},{56,-54.8},{56,-72},{-60,-72},{-60,20.1},{-100.1,20.1}},
+        color={255,127,0}));
   annotation (
     Icon(coordinateSystem(preserveAspectRatio=false,extent={{-60,-100},{60,100}}),
         graphics={
