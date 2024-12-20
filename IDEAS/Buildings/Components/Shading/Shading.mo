@@ -117,6 +117,7 @@ protected
     epsLw_frame=epsLw_frame,
     epsLw_glazing=epsLw_glazing,
     epsSw_shading=epsSw_shading,
+    refSw_shading=1-epsSw_shading-shaPro.shaCorr,
     g_glazing=g_glazing,
     linCon=linCon,
     linRad=linRad,
@@ -700,7 +701,28 @@ equation
   connect(boxAndScreen.TDryBul, TDryBul) annotation (Line(points={{-8.5,
           -55.3333},{40,-55.3333},{40,-10}},
                                    color={0,0,127}));
-
+  
+  
+  connect(m_flow, boxAndScreen.m_flow) annotation(
+    Line(points = {{40, -90}, {-12, -90}, {-12, -62}, {-10, -62}}, color = {0, 0, 127}));
+  connect(m_flow, none.m_flow) annotation(
+    Line(points = {{40, -90}, {-10, -90}, {-10, -40}}, color = {0, 0, 127}));
+  connect(m_flow, sideFins.m_flow) annotation(
+    Line(points = {{40, -90}, {-10, -90}, {-10, -20}}, color = {0, 0, 127}));
+  connect(m_flow, screen.m_flow) annotation(
+    Line(points = {{40, -90}, {-10, -90}, {-10, 0}}, color = {0, 0, 127}));
+  connect(m_flow, overhangAndScreen.m_flow) annotation(
+    Line(points = {{40, -90}, {-10, -90}, {-10, 20}}, color = {0, 0, 127}));
+  connect(m_flow, overhang.m_flow) annotation(
+    Line(points = {{40, -90}, {-10, -90}, {-10, 40}}, color = {0, 0, 127}));
+  connect(m_flow, buildingShade.m_flow) annotation(
+    Line(points = {{40, -90}, {-10, -90}, {-10, 60}}, color = {0, 0, 127}));
+  connect(m_flow, box.m_flow) annotation(
+    Line(points = {{40, -90}, {-10, -90}, {-10, 80}}, color = {0, 0, 127}));
+  connect(m_flow, horizontalFins.m_flow) annotation(
+    Line(points = {{40, -90}, {-10, -90}, {-10, 100}}, color = {0, 0, 127}));
+  connect(m_flow, overhangAndHorizontalFins.m_flow) annotation(
+    Line(points = {{40, -90}, {-10, -90}, {-10, 120}}, color = {0, 0, 127}));
   annotation (Documentation(revisions="<html>
 <ul>
 <li>
@@ -708,17 +730,11 @@ July 18, 2022 by Filip Jorissen:<br/>
 Refactored for <a href=\"https://github.com/open-ideas/IDEAS/issues/1270\">#1270</a> for including thermal effect of screens.
 </li>
 <li>
-August 22, 2018 by Filip Jorissen:<br/>
-Fixed bug in implementation due to missing <code>irr</code>.
-See <a href=\"https://github.com/open-ideas/IDEAS/pull/818\">
-#818</a>.
-</li>
-<li>
-August 2, 2018, by Iago Cupeiro:<br/>
+Aug 2 2018, by Iago Cupeiro:<br/>
 Added missing beta parameter.
 </li>
 <li>
-May 4, 2018, by Iago Cupeiro:<br/>
+May 4 2018, by Iago Cupeiro:<br/>
 Extended with HorizontalFins and OverhangAndHorizontalFins models.
 </li>
 <li>
@@ -727,6 +743,15 @@ Revised implementation for renamed
 ports <code>HDirTil</code> etc.
 See <a href=\"https://github.com/open-ideas/IDEAS/issues/735\">
 #735</a>.
+</li>
+</ul>
+</html>", info="<html>
+<ul>
+<li>
+August 22, 2018 by Filip Jorissen:<br/>
+Fixed bug in implementation due to missing <code>irr</code>.
+See <a href=\"https://github.com/open-ideas/IDEAS/pull/818\">
+#818</a>.
 </li>
 </ul>
 </html>"),

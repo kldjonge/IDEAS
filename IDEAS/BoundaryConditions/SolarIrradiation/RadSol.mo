@@ -3,9 +3,9 @@ model RadSol "Block that computes surface-dependent environment data"
   extends Modelica.Blocks.Icons.Block;
 
   parameter Real rho=0.2 "Ground reflectance";
-  parameter Modelica.Units.SI.Angle inc(displayUnit="degree") "inclination";
-  parameter Modelica.Units.SI.Angle azi(displayUnit="degree") "azimuth";
-  parameter Modelica.Units.SI.Angle lat(displayUnit="degree") "latitude";
+  parameter Modelica.Units.SI.Angle inc(displayUnit="deg") "inclination";
+  parameter Modelica.Units.SI.Angle azi(displayUnit="deg") "azimuth";
+  parameter Modelica.Units.SI.Angle lat(displayUnit="deg") "latitude";
   parameter Boolean remDefVals = false "Remove default signal values";
   parameter Boolean outputAngles=true "Set to false when linearising only";
 
