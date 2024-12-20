@@ -32,7 +32,7 @@ block TWetBul_TDryBulPhi
     annotation (Placement(transformation(extent={{100,-10},{120,10}})));
 
 protected
-  constant Real unitconv(unit="K")=1 "constant 1 with unit K to avoid unit warning";
+  constant Real unitconv(unit="1/rad")=1 "constant 1 with unit K to avoid unit warning";
   Modelica.Units.NonSI.Temperature_degC TDryBul_degC
     "Dry bulb temperature in degree Celsius";
   Real rh_per(min=0) "Relative humidity in percentage";
@@ -48,10 +48,10 @@ equation
     TDryBul_degC = TDryBul - 273.15;
     rh_per       = 100*phi;
     TWetBul      = 273.15 + TDryBul_degC
-       * Modelica.Math.atan(0.151977 * sqrt(rh_per + 8.313659))
+       * Modelica.Math.atan(0.151977 * sqrt(rh_per + 8.313659))*unitconv
        + Modelica.Math.atan(TDryBul_degC + rh_per)*unitconv
        - Modelica.Math.atan(rh_per-1.676331)*unitconv
-       + 0.00391838 * rh_per^(1.5) * Modelica.Math.atan( 0.023101 * rh_per)  - 4.686035;
+       + 0.00391838 * rh_per^(1.5) * Modelica.Math.atan( 0.023101 * rh_per)*unitconv  - 4.686035;
     XiSat    = 0;
     XiDryBul = 0;
     XiSatRefIn=0;
