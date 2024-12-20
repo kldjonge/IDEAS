@@ -170,6 +170,8 @@ model Q50_parameterToConnector "Converts parameter values into connectors for pr
     "Custom v50 value";
   parameter Boolean use_custom_q50=false
     "true if custom q50 value should be considered by the zone";
+  parameter Integer Dum=2 "number of dummy connections";
+
   Modelica.Blocks.Interfaces.RealInput q50_zone
     "Input for q50 value computed by the zone"
    annotation (Placement(transformation(extent={{-126,50},{-86,90}})));
@@ -180,7 +182,7 @@ model Q50_parameterToConnector "Converts parameter values into connectors for pr
   Modelica.Blocks.Interfaces.BooleanOutput using_custom_q50 = use_custom_q50
     "Output indicating whether a custom q50 value should be considered by the zone"
    annotation (Placement(transformation(extent={{-100,-30},{-120,-10}})));
-  Modelica.Blocks.Interfaces.RealInput dummy_h[2]
+  Modelica.Blocks.Interfaces.RealInput dummy_h[Dum]
       "Dummy connectors for hzone and hfloor"
       annotation (Placement(transformation(extent={{-126,14},{-86,54}})));
   annotation (Icon(graphics={Rectangle(
@@ -272,6 +274,11 @@ November 7, 2024, by Anna Dell'Isola and Jelger Jansen:<br/>
 Add variable <code>TRefZon</code> to be used when calculating <code>QTra_design</code>.
 See <a href=\"https://github.com/open-ideas/IDEAS/issues/1337\">#1337</a>
 </li>
+<li>
+December 12, 2024, by Klaas De Jonge:<br/>
+Made amount of dummy connection in PartialSurface.Q50_parameterToConnector a parameter.
+</li>
+<li>
 October 30, 2024, by Klaas De Jonge and Filip Jorissen:<br/>
 Additions for supporting interzonal airflow: use of crackoroperabledoor model, default column height implementation for stack-effect.
 </li>
