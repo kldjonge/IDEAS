@@ -9,7 +9,7 @@ model InternalWall "interior opaque wall between two zones"
     E(y=if sim.computeConservationOfEnergy then layMul.E else 0),
     Qgai(y=(if sim.openSystemConservationOfEnergy or not sim.computeConservationOfEnergy then 0 else sum(port_emb.Q_flow))),
     final QTra_design = U_value*A*(TRef_a - TRef_b),
-    q50_zone(v50_surf = 0),
+    q50_zone(v50_surf = 0, Dum=4),
     crackOrOperableDoor(
       h_a1=-0.5*hzone_b + 0.75*hVertical + hRelSurfBot_b,
       h_b2=-0.5*hzone_b + 0.25*hVertical + hRelSurfBot_b,
@@ -192,8 +192,14 @@ equation
     Line(points = {{-40, -70}, {-52, -70}, {-52, 20}, {-100, 20}}, color = {0, 127, 255}));
   connect(boundary3_a.ports[1], propsBusInt.port_3) annotation(
     Line(points = {{40, -70}, {56, -70}, {56, 20}}, color = {0, 127, 255}));
-  annotation(
-    Icon(coordinateSystem(preserveAspectRatio = false, extent = {{-60, -100}, {60, 100}}), graphics = {Rectangle(fillColor = {255, 255, 255}, pattern = LinePattern.None, fillPattern = FillPattern.Solid, extent = {{-52, -90}, {48, -70}}), Rectangle(fillColor = {255, 255, 255}, pattern = LinePattern.None, fillPattern = FillPattern.Solid, extent = {{-50, 80}, {50, 100}}), Rectangle(fillColor = {175, 175, 175}, pattern = LinePattern.None, fillPattern = FillPattern.Backward, extent = {{-10, 80}, {10, -70}}), Line(points = {{-50, 80}, {50, 80}}, color = {175, 175, 175}), Line(points = {{-50, -70}, {50, -70}}, color = {175, 175, 175}), Line(points = {{-50, -90}, {50, -90}}, color = {175, 175, 175}), Line(points = {{-50, 100}, {50, 100}}, color = {175, 175, 175}), Line(points = {{-10, 80}, {-10, -70}}, thickness = 0.5), Line(points = {{10, 80}, {10, -70}}, thickness = 0.5)}),
+  connect(q50_zone.dummy_h[3], propsBus_b.hzone) annotation (Line(points={{79.4,
+          -46.6},{78,-46.6},{78,-48},{72,-48},{72,-46},{56,-46},{56,-14},{-56,
+          -14},{-56,22},{-78,22},{-78,20.1},{-100.1,20.1}}, color={0,0,127}));
+  connect(q50_zone.dummy_h[4], propsBus_b.hfloor) annotation (Line(points={{
+          79.4,-46.6},{56,-46.6},{56,-14},{-56,-14},{-56,22},{-78,22},{-78,20.1},
+          {-100.1,20.1}}, color={0,0,127}));
+  annotation (
+    Icon(coordinateSystem(preserveAspectRatio = false, extent = {{-60, -100}, {60, 100}}), graphics={  Rectangle(fillColor = {255, 255, 255}, pattern = LinePattern.None, fillPattern = FillPattern.Solid, extent = {{-52, -90}, {48, -70}}), Rectangle(fillColor = {255, 255, 255}, pattern = LinePattern.None, fillPattern = FillPattern.Solid, extent = {{-50, 80}, {50, 100}}), Rectangle(fillColor = {175, 175, 175}, pattern = LinePattern.None, fillPattern = FillPattern.Backward, extent = {{-10, 80}, {10, -70}}), Line(points = {{-50, 80}, {50, 80}}, color = {175, 175, 175}), Line(points = {{-50, -70}, {50, -70}}, color = {175, 175, 175}), Line(points = {{-50, -90}, {50, -90}}, color = {175, 175, 175}), Line(points = {{-50, 100}, {50, 100}}, color = {175, 175, 175}), Line(points = {{-10, 80}, {-10, -70}}, thickness = 0.5), Line(points = {{10, 80}, {10, -70}}, thickness = 0.5)}),
     Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-60, -100}, {60, 100}})),
     Documentation(info = "<html>
 <p>
@@ -218,6 +224,10 @@ We assume that the value of <code>A</code> excludes the surface area of the cavi
 </p>
 </html>", revisions = "<html>
 <ul>
+<li>
+December 20, 2024, by Klaas De Jonge:<br/>
+Dummy-connected hzone and hfloor of propsbus_b
+</li>
 <li>
 October 30, 2024, by Klaas De Jonge:<br/>
 Modifications for stack-effect interzonal airflow heights.
