@@ -32,6 +32,7 @@ block TWetBul_TDryBulPhi
     annotation (Placement(transformation(extent={{100,-10},{120,10}})));
 
 protected
+  constant Real unitconv(unit="K")=1 "constant 1 with unit K to avoid unit warning";
   Modelica.Units.NonSI.Temperature_degC TDryBul_degC
     "Dry bulb temperature in degree Celsius";
   Real rh_per(min=0) "Relative humidity in percentage";
@@ -48,8 +49,8 @@ equation
     rh_per       = 100*phi;
     TWetBul      = 273.15 + TDryBul_degC
        * Modelica.Math.atan(0.151977 * sqrt(rh_per + 8.313659))
-       + Modelica.Math.atan(TDryBul_degC + rh_per)
-       - Modelica.Math.atan(rh_per-1.676331)
+       + Modelica.Math.atan(TDryBul_degC + rh_per)*unitconv
+       - Modelica.Math.atan(rh_per-1.676331)*unitconv
        + 0.00391838 * rh_per^(1.5) * Modelica.Math.atan( 0.023101 * rh_per)  - 4.686035;
     XiSat    = 0;
     XiDryBul = 0;
@@ -170,6 +171,10 @@ DOI: 10.1175/JAMC-D-11-0143.1
 </html>",
 revisions="<html>
 <ul>
+<li>
+December 20, 2024, by Klaas De Jonge:<br/>
+Added a unit conversion factor to the empirical expression of stull to avoid unit consistency check warning.
+</li>
 <li>
 November 3, 2016, by Michael Wetter:<br/>
 Changed icon.
