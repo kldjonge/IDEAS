@@ -97,19 +97,18 @@ partial model PartialSurface "Partial model for building envelope component"
     v50_surf=q50_internal*A,
     use_custom_q50=use_custom_q50)
     annotation (Placement(transformation(extent={{80,-60},{100,-40}})));
-  IDEAS.Airflow.Multizone.CrackOrOperableDoor crackOrOperableDoor(
-    A_q50 = A,
-    q50=q50_internal,
-    redeclare package Medium = Medium,
-    h_a1=0.25*hVertical,
-    h_b2=- 0.25*hVertical,
-    h_b1=-0.5*hzone_a + 0.75*hVertical + hRelSurfBot_a,
-    h_a2=-0.5*hzone_a + 0.25*hVertical + hRelSurfBot_a,
-    interZonalAirFlowType = sim.interZonalAirFlowType,
-    inc=inc)                                           if add_door and sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None annotation (
-    Placement(visible = true, transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   Modelica.Blocks.Sources.RealExpression AExp(y = A) "Area expression" annotation(
     Placement(transformation(origin = {0, 20}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Routing.BooleanPassThrough use_custom_50passthrough
+    annotation (Placement(transformation(
+        extent={{-5,-5},{5,5}},
+        rotation=90,
+        origin={47,-25})));
+  Modelica.Blocks.Routing.RealPassThrough v50_passthrough annotation (Placement(
+        transformation(
+        extent={{-5,-5},{5,5}},
+        rotation=90,
+        origin={33,-25})));
 protected
   parameter Boolean add_door = true "Option to disable crackOrOperableDoor";
   final parameter Modelica.Units.SI.Angle aziInt=
@@ -160,8 +159,19 @@ protected
         use_custom_q50)
     "Block that contributes surface area to the siminfomanager"
     annotation (Placement(transformation(extent={{80,-100},{100,-80}})));
-
-
+public
+  IDEAS.Airflow.Multizone.CrackOrOperableDoor crackOrOperableDoor(
+    A_q50 = A,
+    q50=q50_internal,
+    redeclare package Medium = Medium,
+    h_a1=0.25*hVertical,
+    h_b2=- 0.25*hVertical,
+    h_b1=-0.5*hzone_a + 0.75*hVertical + hRelSurfBot_a,
+    h_a2=-0.5*hzone_a + 0.25*hVertical + hRelSurfBot_a,
+    interZonalAirFlowType = sim.interZonalAirFlowType,
+    inc=inc)                                           if add_door and sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None annotation (
+    Placement(visible = true, transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+protected
 model Q50_parameterToConnector "Converts parameter values into connectors for propsBus"
   extends Modelica.Blocks.Icons.Block;
 
@@ -240,16 +250,12 @@ equation
       color={255,204,51},
       thickness=0.5));
    connect(setArea.areaPort, sim.areaPort);
-  connect(q50_zone.v50, propsBusInt.v50) annotation (Line(points={{79,-58},{56,-58},
-          {56,-20},{56.09,-20},{56.09,19.91}},               color={0,0,127}));
   connect(q50_zone.q50_zone, propsBusInt.q50_zone) annotation (Line(points={{79.4,
           -43},{79.4,-44},{56.09,-44},{56.09,19.91}}, color={0,0,127}));
-  connect(q50_zone.using_custom_q50, propsBusInt.use_custom_q50) annotation (Line(points={{79,-52},
-          {56.09,-52},{56.09,19.91}},      color={0,0,127}));
   connect(setArea.use_custom_n50, propsBusInt.use_custom_n50) annotation (Line(points={{79.4,
           -91},{79.4,-90.5},{56.09,-90.5},{56.09,19.91}},      color={255,0,255}));
-  connect(setArea.v50, propsBus_a.v50) annotation (Line(points={{79.4,-83.2},{
-          79.4,-82},{56,-82},{56,0},{100.1,0},{100.1,19.9}}, color={0,0,127}));
+  connect(setArea.v50, propsBus_a.v50) annotation (Line(points={{79.4,-83.2},{79.4,
+          -82},{56,-82},{56,0},{100.1,0},{100.1,19.9}},      color={0,0,127}));
   connect(q50_zone.dummy_h[1], propsBusInt.hzone) annotation (Line(points={{79.4,
           -47.6},{80,-47.6},{80,-48},{56.09,-48},{56.09,19.91}}, color={0,0,127}));
   connect(q50_zone.dummy_h[2], propsBusInt.hfloor) annotation (Line(points={{79.4,
@@ -264,6 +270,22 @@ equation
   end if;
   connect(AExp.y, propsBusInt.area) annotation(
     Line(points = {{12, 20}, {56, 20}}, color = {0, 0, 127}));
+  connect(q50_zone.using_custom_q50, use_custom_50passthrough.u)    annotation (Line(points={{79,-52},{47,-52},{47,-31}}, color={255,0,255}));
+  connect(use_custom_50passthrough.y, propsBusInt.use_custom_q50) annotation (
+      Line(points={{47,-19.5},{47,19.91},{56.09,19.91}}, color={255,0,255}),
+      Text(
+      string="%second",
+      index=1,
+      extent={{-3,6},{-3,6}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(q50_zone.v50, v50_passthrough.u) annotation (Line(points={{79,-58},{56,
+          -58},{56,-36},{33,-36},{33,-31}}, color={0,0,127}));
+  connect(v50_passthrough.y, propsBusInt.v50) annotation (Line(points={{33,-19.5},
+          {33,19.91},{56.09,19.91}}, color={0,0,127}), Text(
+      string="%second",
+      index=1,
+      extent={{-3,6},{-3,6}},
+      horizontalAlignment=TextAlignment.Right));
   annotation (
     Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
             100,100}})),
