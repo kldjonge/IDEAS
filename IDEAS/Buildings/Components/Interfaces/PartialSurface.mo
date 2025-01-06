@@ -293,6 +293,10 @@ equation
     Documentation(revisions="<html>
 <ul>
 <li>
+January 6, 2025, by Klaas De Jonge:<br/>
+Addition of BooleanPassThrough and RealPassThrough block for v50 and use_custom_q50 to avoid warning.
+</li>
+<li>
 December 12, 2024, by Klaas De Jonge:<br/>
 Made amount of dummy connection in PartialSurface.Q50_parameterToConnector a parameter.
 </li>
