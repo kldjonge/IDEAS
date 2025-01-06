@@ -291,6 +291,11 @@ equation
     Icon(coordinateSystem(preserveAspectRatio = false, extent = {{-50, -100}, {50, 100}})),
     Documentation(revisions="<html>
 <ul>
+
+<li>
+January 6, 2025, by Klaas De Jonge:<br/>
+Addition of BooleanPassThrough and RealPassThrough block for v50 and use_custom_q50 to avoid warning.
+</li>
 <li>
 November 7, 2024, by Anna Dell'Isola and Jelger Jansen:<br/>
 Add variable <code>TRefZon</code> to be used when calculating <code>QTra_design</code>.
