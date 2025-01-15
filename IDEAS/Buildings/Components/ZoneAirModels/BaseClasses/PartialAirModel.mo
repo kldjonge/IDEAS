@@ -10,7 +10,7 @@ partial model PartialAirModel "Partial for air models"
   parameter Integer nSurf "Number of connected surfaces";
   parameter Integer nSeg(min=1)=1 "Number of air segments";
   parameter Integer nPorts "Number of fluid port connections to zone air volume";
-  parameter Modelica.Units.SI.Volume Vtot "Total zone air volume";
+  parameter Modelica.Units.SI.Volume Vtot(min=Modelica.Constants.small) "Total zone air volume";
   parameter Boolean allowFlowReversal=true
      "= false to simplify equations, assuming, but not enforcing, no flow reversal"
     annotation(Dialog(tab="Advanced"));
