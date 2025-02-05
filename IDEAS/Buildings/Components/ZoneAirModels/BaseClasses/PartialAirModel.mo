@@ -80,6 +80,11 @@ protected
             -100},{100,100}})), Documentation(revisions="<html>
 <ul>
 <li>
+January 24, 2025, by Klaas De Jonge:<br/>
+Added minimum zone air volume to avoid division by zero warning.
+See <a href=\"https://github.com/open-ideas/IDEAS/issues/1402\">#1402</a>.
+</li>
+<li>
 July 27, 2018 by Filip Jorissen:<br/>
 Added output for the CO2 concentration.
 See <a href=\"https://github.com/open-ideas/IDEAS/issues/868\">#868</a>.

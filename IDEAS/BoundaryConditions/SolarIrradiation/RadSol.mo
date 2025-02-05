@@ -141,6 +141,11 @@ equation
     Documentation(revisions="<html>
 <ul>
 <li>
+January 24, 2025, by Klaas De Jonge:<br/>
+Changed <code>displayUnit</code> angles from <code>degree</code> to <code>deg</code> to avoid warnings.
+See <a href=\"https://github.com/open-ideas/IDEAS/issues/1402\">#1402</a> 
+</li>
+<li>
 November 28, 2019, by Ian Beausoleil-Morrison:<br/>
 Add RealInput's for wind speed and wind direction.<br/>
 Instantiate extConvForcedCoeff.mo and place resulting coefficient for forced convection on SolBus.

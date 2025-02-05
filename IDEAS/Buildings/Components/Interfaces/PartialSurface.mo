@@ -1,6 +1,6 @@
 within IDEAS.Buildings.Components.Interfaces;
 partial model PartialSurface "Partial model for building envelope component"
-  
+
   outer IDEAS.BoundaryConditions.SimInfoManager sim
     "Simulation information manager for climate data"
     annotation (Placement(visible = true, transformation(origin = {50, 180}, extent = {{30, -100}, {50, -80}}, rotation = 0)));
@@ -26,13 +26,7 @@ partial model PartialSurface "Partial model for building envelope component"
     annotation (Dialog(group="Design power",tab="Advanced"));
   parameter Modelica.Units.SI.Temperature T_start=293.15
     "Start temperature for each of the layers"
-
-    annotation(Dialog(tab="Dynamics", group="Initial condition"));
-
-  parameter Modelica.Units.SI.Temperature TRef_a=291.15
-    "Reference temperature of zone on side of propsBus_a, for calculation of design heat loss"
-    annotation (Dialog(group="Design power",tab="Advanced"));
-
+ annotation (Dialog(tab="Dynamics", group="Initial condition"));
   parameter Boolean linIntCon_a=sim.linIntCon
     "= true, if convective heat transfer should be linearised"
     annotation (Dialog(tab="Convection"));
@@ -57,16 +51,16 @@ partial model PartialSurface "Partial model for building envelope component"
 
   final parameter Modelica.Units.SI.Length hzone_a( fixed=false);//connected with propsbus in inital equation
   final parameter Modelica.Units.SI.Length hAbs_floor_a( fixed=false);
-  parameter Modelica.Units.SI.Length hVertical=if IDEAS.Utilities.Math.Functions.isAngle(inc,IDEAS.Types.Tilt.Floor) or IDEAS.Utilities.Math.Functions.isAngle(inc,IDEAS.Types.Tilt.Ceiling) then 0 else hzone_a "Vertical surface height, height of the surface projected to the vertical, 0 for floors and ceilings" annotation(Evaluate=true);
-  parameter Modelica.Units.SI.Length hRelSurfBot_a= if IDEAS.Utilities.Math.Functions.isAngle(inc,IDEAS.Types.Tilt.Ceiling) then hzone_a else 0  "Height between the lowest point of the surface (bottom) and the floor level of the zone connected at propsBus_a"annotation(Evaluate=true);
+  parameter Modelica.Units.SI.Length hVertical=if IDEAS.Utilities.Math.Functions.isAngle(incInt,IDEAS.Types.Tilt.Floor) or IDEAS.Utilities.Math.Functions.isAngle(incInt,IDEAS.Types.Tilt.Ceiling) then 0 else hzone_a "Vertical surface height, height of the surface projected to the vertical, 0 for floors and ceilings" annotation(Evaluate=true);
+  parameter Modelica.Units.SI.Length hRelSurfBot_a= if IDEAS.Utilities.Math.Functions.isAngle(incInt,IDEAS.Types.Tilt.Ceiling) then hzone_a else 0  "Height between the lowest point of the surface (bottom) and the floor level of the zone connected at propsBus_a"
+                                                                                                                                                                                                        annotation(Evaluate=true);
   final parameter Modelica.Units.SI.Length Habs_surf=hAbs_floor_a+hRelSurfBot_a+(hVertical/2)  "Absolute height of the middle of the surface, can be used to check the heights after initialisation";
 
   IDEAS.Buildings.Components.Interfaces.ZoneBus propsBus_a(
     redeclare final package Medium = Medium,
     numIncAndAziInBus=sim.numIncAndAziInBus, outputAngles=sim.outputAngles,
     final use_port_1=sim.use_port_1,
-    final use_port_2=sim.use_port_2)
-                                             "If inc = Floor, then propsbus_a should be connected to the zone above this floor.
+    final use_port_2=sim.use_port_2)         "If inc = Floor, then propsbus_a should be connected to the zone above this floor.
     If inc = ceiling, then propsbus_a should be connected to the zone below this ceiling.
     If component is an outerWall, porpsBus_a should be connect to the zone."
     annotation (Placement(transformation(
@@ -99,18 +93,29 @@ partial model PartialSurface "Partial model for building envelope component"
     v50_surf=q50_internal*A,
     use_custom_q50=use_custom_q50)
     annotation (Placement(transformation(extent={{80,-60},{100,-40}})));
+  IDEAS.Airflow.Multizone.CrackOrOperableDoor crackOrOperableDoor(
+    A_q50 = A,
+    q50=q50_internal,
+    redeclare package Medium = Medium,
+    h_a1=0.25*hVertical,
+    h_b2=- 0.25*hVertical,
+    h_b1=-0.5*hzone_a + 0.75*hVertical + hRelSurfBot_a,
+    h_a2=-0.5*hzone_a + 0.25*hVertical + hRelSurfBot_a,
+    interZonalAirFlowType = sim.interZonalAirFlowType,
+    inc=incInt)                                           if add_door and sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None annotation (
+    Placement(visible = true, transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   Modelica.Blocks.Sources.RealExpression AExp(y = A) "Area expression" annotation(
     Placement(transformation(origin = {0, 20}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Blocks.Routing.BooleanPassThrough use_custom_50passthrough
+  Modelica.Blocks.Routing.BooleanPassThrough use_custom_q50PassThrough
     annotation (Placement(transformation(
+        extent={{-5,5},{5,-5}},
+        rotation=90,
+        origin={62,-20})));
+  Modelica.Blocks.Routing.RealPassThrough v50PassThrough annotation (Placement(transformation(
         extent={{-5,-5},{5,5}},
         rotation=90,
-        origin={47,-25})));
-  Modelica.Blocks.Routing.RealPassThrough v50_passthrough annotation (Placement(
-        transformation(
-        extent={{-5,-5},{5,5}},
-        rotation=90,
-        origin={33,-25})));
+        origin={50,-20})));
+
 protected
   parameter Boolean add_door = true "Option to disable crackOrOperableDoor";
   final parameter Modelica.Units.SI.Angle aziInt=
@@ -138,6 +143,9 @@ protected
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlowQgai
     "Component for computing conservation of energy";
 
+  Modelica.Units.SI.Temperature TRefZon=propsBusInt.TRefZon
+      "Reference zone temperature for calculation of design heat load";
+
   IDEAS.Buildings.Components.Interfaces.ZoneBusVarMultiplicator gain(redeclare
       package Medium = Medium,                                       k=nWin)
     "Gain for all propsBus variable to represent nWin surfaces instead of 1"
@@ -161,19 +169,8 @@ protected
         use_custom_q50)
     "Block that contributes surface area to the siminfomanager"
     annotation (Placement(transformation(extent={{80,-100},{100,-80}})));
-public
-  IDEAS.Airflow.Multizone.CrackOrOperableDoor crackOrOperableDoor(
-    A_q50 = A,
-    q50=q50_internal,
-    redeclare package Medium = Medium,
-    h_a1=0.25*hVertical,
-    h_b2=- 0.25*hVertical,
-    h_b1=-0.5*hzone_a + 0.75*hVertical + hRelSurfBot_a,
-    h_a2=-0.5*hzone_a + 0.25*hVertical + hRelSurfBot_a,
-    interZonalAirFlowType = sim.interZonalAirFlowType,
-    inc=inc)                                           if add_door and sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None annotation (
-    Placement(visible = true, transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-protected
+
+
 model Q50_parameterToConnector "Converts parameter values into connectors for propsBus"
   extends Modelica.Blocks.Icons.Block;
 
@@ -183,7 +180,8 @@ model Q50_parameterToConnector "Converts parameter values into connectors for pr
     "Custom v50 value";
   parameter Boolean use_custom_q50=false
     "true if custom q50 value should be considered by the zone";
-  parameter Integer Dum=2 "number of dummy connections";
+  parameter Integer nDum=2
+    "Number of dummy connections";
 
   Modelica.Blocks.Interfaces.RealInput q50_zone
     "Input for q50 value computed by the zone"
@@ -195,7 +193,7 @@ model Q50_parameterToConnector "Converts parameter values into connectors for pr
   Modelica.Blocks.Interfaces.BooleanOutput using_custom_q50 = use_custom_q50
     "Output indicating whether a custom q50 value should be considered by the zone"
    annotation (Placement(transformation(extent={{-100,-30},{-120,-10}})));
-  Modelica.Blocks.Interfaces.RealInput dummy_h[Dum]
+  Modelica.Blocks.Interfaces.RealInput dummy_h[nDum]
       "Dummy connectors for hzone and hfloor"
       annotation (Placement(transformation(extent={{-126,14},{-86,54}})));
   annotation (Icon(graphics={Rectangle(
@@ -256,38 +254,27 @@ equation
           -43},{79.4,-44},{56.09,-44},{56.09,19.91}}, color={0,0,127}));
   connect(setArea.use_custom_n50, propsBusInt.use_custom_n50) annotation (Line(points={{79.4,
           -91},{79.4,-90.5},{56.09,-90.5},{56.09,19.91}},      color={255,0,255}));
-  connect(setArea.v50, propsBus_a.v50) annotation (Line(points={{79.4,-83.2},{79.4,
-          -82},{56,-82},{56,0},{100.1,0},{100.1,19.9}},      color={0,0,127}));
-  connect(q50_zone.dummy_h[1], propsBusInt.hzone) annotation (Line(points={{79.4,
-          -47.6},{80,-47.6},{80,-48},{56.09,-48},{56.09,19.91}}, color={0,0,127}));
-  connect(q50_zone.dummy_h[2], propsBusInt.hfloor) annotation (Line(points={{79.4,
-          -45.6},{80,-45.6},{80,-46},{56.09,-46},{56.09,19.91}}, color={0,0,127}));
+  connect(setArea.v50, propsBus_a.v50) annotation (Line(points={{79.4,-83.2},{
+          79.4,-82},{56,-82},{56,0},{100.1,0},{100.1,19.9}}, color={0,0,127}));
+  connect(q50_zone.dummy_h[1], propsBusInt.hzone);
+  connect(q50_zone.dummy_h[2], propsBusInt.hfloor);
   if sim.use_port_1 then
     connect(crackOrOperableDoor.port_b1, propsBusInt.port_1) annotation(
-    Line(points = {{40, -46}, {56, -46}, {56, 20}}, color = {0, 127, 255}));
+    Line(points={{40,-46},{56.09,-46},{56.09,19.91}},
+                                                    color = {0, 127, 255}));
   end if;
   if sim.use_port_2 then
     connect(crackOrOperableDoor.port_a2, propsBusInt.port_2) annotation(
-    Line(points = {{40, -58}, {56, -58}, {56, 20}}, color = {0, 127, 255}));
+    Line(points={{40,-58},{56.09,-58},{56.09,19.91}},
+                                                    color = {0, 127, 255}));
   end if;
   connect(AExp.y, propsBusInt.area) annotation(
-    Line(points = {{12, 20}, {56, 20}}, color = {0, 0, 127}));
-  connect(q50_zone.using_custom_q50, use_custom_50passthrough.u)    annotation (Line(points={{79,-52},{47,-52},{47,-31}}, color={255,0,255}));
-  connect(use_custom_50passthrough.y, propsBusInt.use_custom_q50) annotation (
-      Line(points={{47,-19.5},{47,19.91},{56.09,19.91}}, color={255,0,255}),
-      Text(
-      string="%second",
-      index=1,
-      extent={{-3,6},{-3,6}},
-      horizontalAlignment=TextAlignment.Right));
-  connect(q50_zone.v50, v50_passthrough.u) annotation (Line(points={{79,-58},{56,
-          -58},{56,-36},{33,-36},{33,-31}}, color={0,0,127}));
-  connect(v50_passthrough.y, propsBusInt.v50) annotation (Line(points={{33,-19.5},
-          {33,19.91},{56.09,19.91}}, color={0,0,127}), Text(
-      string="%second",
-      index=1,
-      extent={{-3,6},{-3,6}},
-      horizontalAlignment=TextAlignment.Right));
+    Line(points={{11,20},{34,20},{34,19.91},{56.09,19.91}},
+                                        color = {0, 0, 127}));
+  connect(q50_zone.v50, v50PassThrough.u) annotation (Line(points={{79,-58},{56,-58},{56,-30},{50,-30},{50,-26}}, color={0,0,127}));
+  connect(v50PassThrough.y, propsBusInt.v50) annotation (Line(points={{50,-14.5},{50,-8},{56.09,-8},{56.09,19.91}}, color={0,0,127}));
+  connect(q50_zone.using_custom_q50, use_custom_q50PassThrough.u) annotation (Line(points={{79,-52},{56,-52},{56,-30},{62,-30},{62,-26}}, color={255,0,255}));
+  connect(use_custom_q50PassThrough.y, propsBusInt.use_custom_q50) annotation (Line(points={{62,-14.5},{62,-8},{56.09,-8},{56.09,19.91}}, color={255,0,255}));
   annotation (
     Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
             100,100}})),
@@ -295,12 +282,10 @@ equation
     Documentation(revisions="<html>
 <ul>
 <li>
-January 6, 2025, by Klaas De Jonge:<br/>
-Addition of BooleanPassThrough and RealPassThrough block for v50 and use_custom_q50 to avoid warning.
-</li>
-<li>
-December 12, 2024, by Klaas De Jonge:<br/>
-Made amount of dummy connection in PartialSurface.Q50_parameterToConnector a parameter.
+January 24, 2025, by Klaas De Jonge:<br/>
+Addition of BooleanPassThrough and RealPassThrough block for v50 and use_custom_q50 and
+parameter for number of dummy connections in <code>Q50_parameterToConnector</code> to avoid translation warnings.
+See <a href=\"https://github.com/open-ideas/IDEAS/issues/1402\">#1402</a>
 </li>
 <li>
 November 7, 2024, by Anna Dell'Isola and Jelger Jansen:<br/>
