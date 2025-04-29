@@ -302,7 +302,8 @@ model Structure "Ppd 12 example model"
     mSenFac=1,
     n50=n50,
     nSurfExt=0,
-    w=lHalfBuilding, wFlo = 0.8)
+    w=lHalfBuilding, wFlo = 0.8,
+    intFlo(CheckVH=false))
     "Stairway"
     annotation (Placement(transformation(extent={{86,26},{66,6}})));
 
@@ -380,7 +381,8 @@ model Structure "Ppd 12 example model"
     redeclare IDEAS.Buildings.Validation.Data.Constructions.LightWall
       constructionType,
     A=lHallway*wHallway2,
-    inc=IDEAS.Types.Tilt.Floor)
+    inc=IDEAS.Types.Tilt.Floor,
+    CheckVH=false)
     "Dummy for representing stairway connection between floors"
     annotation (Placement(transformation(extent={{182,-22},{192,-2}})));
 equation
