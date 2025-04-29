@@ -285,7 +285,8 @@ model Structure "Ppd 12 example model"
     redeclare IDEAS.Examples.PPD12.Data.OuterWall conTypA,
     redeclare IDEAS.Examples.PPD12.Data.TripleGlazing glazingA,
     redeclare IDEAS.Examples.PPD12.Data.CommonWall conTypB,
-    redeclare IDEAS.Examples.PPD12.Data.Floor conTypFlo,
+    redeclare IDEAS.Buildings.Validation.Data.Constructions.LightWall
+      conTypFlo,
     redeclare IDEAS.Examples.PPD12.Data.InteriorWall10 conTypC,
     A_winA=1.09*1.69,aziA=east,
     bouTypA=IDEAS.Buildings.Components.Interfaces.BoundaryType.OuterWall,
@@ -376,7 +377,8 @@ model Structure "Ppd 12 example model"
         origin={283,-2})));
   IDEAS.Buildings.Components.InternalWall cei3(
     azi=0,
-    redeclare IDEAS.Examples.PPD12.Data.Floor constructionType,
+    redeclare IDEAS.Buildings.Validation.Data.Constructions.LightWall
+      constructionType,
     A=lHallway*wHallway2,
     inc=IDEAS.Types.Tilt.Floor)
     "Dummy for representing stairway connection between floors"
