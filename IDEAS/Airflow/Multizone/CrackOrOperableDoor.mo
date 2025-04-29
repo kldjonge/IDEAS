@@ -18,7 +18,7 @@ model CrackOrOperableDoor
         choice(redeclare package Medium = IDEAS.Media.Air "Moist air")));
   parameter BoundaryConditions.Types.InterZonalAirFlow interZonalAirFlowType
     "Interzonal air flow type";
-  parameter SI.Angle inc=Modelica.Constants.pi/2 "inclination angle (vertical=pi/2)";
+  parameter Modelica.Units.SI.Angle inc=Modelica.Constants.pi/2 "inclination angle (vertical=pi/2)";
   parameter Modelica.Units.SI.Area A_q50 "Surface area for leakage computation (closed door)" annotation (Dialog(group="Crack or Closed door"));
   parameter Real q50(unit="m3/(h.m2)") "Surface air tightness" annotation (Dialog(group="Crack or Closed door"));
   parameter Modelica.Units.SI.Length wOpe=0.9 "Width of opening"   annotation (Dialog(group="Open door"));
@@ -30,10 +30,10 @@ model CrackOrOperableDoor
   parameter Modelica.Units.SI.Length h_a1 = 0 "Height of crack at port a1(hasCavity=false), center of conected zone is 0" annotation (Dialog(group="Density Column Heights"));
   parameter Modelica.Units.SI.Length h_a2  "Height at of crack port a2(hasCavity=false), center of conected zone is 0" annotation (Dialog(group="Density Column Heights"));
 
-  parameter SI.Length hA=(h_a1 + h_b2)/2
+  parameter Modelica.Units.SI.Length hA=(h_a1 + h_b2)/2
     "Height of reference pressure at port a1 for opening (hasCavity=true) model, opening starting height is 0"
                                                                                                               annotation (Dialog(group="Density Column Heights"));
-  parameter SI.Length hB=(h_a2 + h_b1)/2
+  parameter Modelica.Units.SI.Length hB=(h_a2 + h_b1)/2
     "Height of reference pressure at port b1 for opening (hasCavity=true) model, opening starting height is 0"
                                                                                                               annotation (Dialog(group="Density Column Heights"));
 
