@@ -111,6 +111,7 @@ algorithm
         y2=yd[i + 1],
         y1d=d[i],
         y2d=d[i + 1]);
+  annotation(Inline=true);
 end windPressureProfile;
   Modelica.Units.SI.Angle surOut=azi - Modelica.Constants.pi
     "Angle of surface that is used to compute angle of attack of wind";
