@@ -94,7 +94,7 @@ model CrackOrOperableDoor
  IDEAS.Airflow.Multizone.Point_m_flow point_m_flow1(
   redeclare package Medium = Medium,
   dpMea_nominal = dpCloRat,
-    forceErrorControlOnFlow=true,
+    forceErrorControlOnFlow=false,
     mMea_flow_nominal=if openDoorOnePort and interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort
          then wOpe*hOpe*rho_default*CDCloRat*(2*dpCloRat/rho_default)^mClo else (if
         interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts
@@ -133,12 +133,13 @@ model CrackOrOperableDoor
  IDEAS.Airflow.Multizone.Point_m_flow point_m_flow2(
    redeclare package Medium = Medium,
    dpMea_nominal = dpCloRat,
-   forceErrorControlOnFlow=true,
+    forceErrorControlOnFlow=false,
    m = mClo,
    mMea_flow_nominal = (q50/3600*rho_default)*A_q50*0.5,
    useDefaultProperties = false) if not useDoor and interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts "Pressure drop equation" annotation (
     Placement(visible = true, transformation(origin = {0, -60}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
  IDEAS.Airflow.Multizone.DoorDiscretizedOperable doo(
+    forceErrorControlOnFlow=false,
    final dh=doo.hOpe*sin(inc)/nCom,
    redeclare package Medium = Medium,
    final hA=hA,
