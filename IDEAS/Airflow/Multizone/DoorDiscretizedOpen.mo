@@ -24,7 +24,7 @@ equation
   CVal = CD*dA*sqrt(2/rho_default);
   // orifice equation
   for i in 1:nCom loop
-    dV_flow[i] = IDEAS.Airflow.Multizone.BaseClasses.powerLawFixedM(
+    dV_flow[i] = homotopy(actual=IDEAS.Airflow.Multizone.BaseClasses.powerLawFixedM(
       C=CVal,
       dp=dpAB[i],
       m=mFixed,
@@ -32,7 +32,7 @@ equation
       b=b,
       c=c,
       d=d,
-      dp_turbulent=dp_turbulent);
+      dp_turbulent=dp_turbulent),simplified=CVal*dpAB[i]);
   end for;
 
   annotation (defaultComponentName="doo",

@@ -53,10 +53,10 @@ equation
 
   // orifice equation
   for i in 1:nCom loop
-    dV_flow[i] = IDEAS.Airflow.Multizone.BaseClasses.powerLaw(C=CVal,
+    dV_flow[i] = homotopy(actual=IDEAS.Airflow.Multizone.BaseClasses.powerLaw(C=CVal,
       dp=dpAB[i],
       m=m,
-      dp_turbulent=dp_turbulent);
+      dp_turbulent=dp_turbulent),simplified=CVal*dpAB[i]);
   end for;
 
   annotation (Icon(graphics={

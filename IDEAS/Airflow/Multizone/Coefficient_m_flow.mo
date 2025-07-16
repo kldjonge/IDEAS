@@ -1,7 +1,7 @@
 within IDEAS.Airflow.Multizone;
 model Coefficient_m_flow "Powerlaw with coefficient for mass flow rate"
   extends IDEAS.Airflow.Multizone.BaseClasses.PartialOneWayFlowElement(
-    m_flow=rho*IDEAS.Airflow.Multizone.BaseClasses.powerLawFixedM(
+    m_flow=homotopy(actual=rho*IDEAS.Airflow.Multizone.BaseClasses.powerLawFixedM(
         C=C,
         dp=dp,
         m=m,
@@ -9,7 +9,7 @@ model Coefficient_m_flow "Powerlaw with coefficient for mass flow rate"
         b=b,
         c=c,
         d=d,
-        dp_turbulent=dp_turbulent),
+        dp_turbulent=dp_turbulent),simplified=rho_default*C*dp),
     final m_flow_nominal=k*dp_turbulent,
     final m_flow_small=1E-4*abs(m_flow_nominal));
   extends IDEAS.Airflow.Multizone.BaseClasses.PowerLawResistanceParameters(
