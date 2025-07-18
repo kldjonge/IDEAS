@@ -73,10 +73,10 @@ protected
     annotation (Placement(transformation(extent={{-10,118},{10,138}})));
   Modelica.Blocks.Routing.RealPassThrough epsSw "Shortwave emissivity"
     annotation (Placement(transformation(extent={{-10,88},{10,108}})));
-  Modelica.Blocks.Math.Gain v50(k=k)
+  Modelica.Blocks.Math.Gain v50(k=k,u(unit="m3/h"),y(unit="m3/h"))
     "v50 value if q50 of the surface is custome"
     annotation (Placement(transformation(extent={{-10,-232},{10,-212}})));
-  Modelica.Blocks.Routing.RealPassThrough q50_zone
+  Modelica.Blocks.Routing.RealPassThrough q50_zone(u(unit="m3/(h.m2)"),y(unit="m3/(h.m2)"))
     "q50 for non costume surfaces"
     annotation (Placement(transformation(extent={{8,-268},{-12,-248}})));
   Modelica.Blocks.Routing.BooleanPassThrough use_custom_q50
