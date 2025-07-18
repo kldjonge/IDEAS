@@ -76,8 +76,7 @@ equation
         coordinateSystem(preserveAspectRatio=false)),
     experiment(
       StopTime=1209600,
-      Interval=3600.00288,
-      Tolerance=1e-12,
+      Interval=3600,
       __Dymola_fixedstepsize=15,
       __Dymola_Algorithm="Dassl"),
     Documentation(revisions="<html>
