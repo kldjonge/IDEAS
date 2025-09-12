@@ -53,13 +53,13 @@ equation
 
   // Assign empirical coefficient according to flow regime.
   if isCeiling then
-    if dT > 0 then
+    if noEvent(dT > 0) then
       C = C_horz_buoyant;
     else
       C = C_horz_stable;
     end if;
   elseif isFloor then
-    if dT < 0 then
+    if noEvent(dT < 0) then
       C = C_horz_buoyant;
     else
       C = C_horz_stable;
