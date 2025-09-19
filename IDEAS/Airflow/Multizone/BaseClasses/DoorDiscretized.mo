@@ -10,9 +10,9 @@ partial model DoorDiscretized
     displayUnit="Pa") = 0.01
     "Pressure difference where laminar and turbulent flow relation coincide. Recommended: 0.01";
 
-  Modelica.Units.SI.PressureDifference dpAB[nCom](each nominal=((1/(3600*nCom))/(0.78*dA*sqrt(2/rho_default)))^(1/m))
+  Modelica.Units.SI.PressureDifference dpAB[nCom](each nominal=((1/3600)/(A*sqrt(2/rho_default)))^(1/m))
     "Pressure difference between compartments";
-  Modelica.Units.SI.Velocity v[nCom](each nominal=0.01)
+  Modelica.Units.SI.Velocity v[nCom](each nominal=0.001)
     "Velocity in compartment from A to B";
   Modelica.Units.SI.Velocity vTop "Velocity at top of opening from A to B";
   Modelica.Units.SI.Velocity vBot "Velocity at bottom of opening from A to B";
