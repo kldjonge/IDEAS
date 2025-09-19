@@ -174,6 +174,30 @@ model CrackOrOperableDoor
 	vZer=MFtrans/(rho_default*doo.wOpe*doo.hOpe)/1000)
 	if useDoorModel
 		annotation (Placement(visible = true, transformation(origin={-2,0},   extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  IDEAS.Airflow.Multizone.DoorDiscretizedOperable doo_operable(
+    forceErrorControlOnFlow=forceErrorControlOnFlow,
+    final dh=if IDEAS.Utilities.Math.Functions.isAngle(inc, IDEAS.Types.Tilt.Ceiling)
+         or IDEAS.Utilities.Math.Functions.isAngle(inc, IDEAS.Types.Tilt.Floor)
+         then 0 else doo_operable.hOpe*sin(inc)/nCom,
+    redeclare package Medium = Medium,
+    final hA=hA,
+    final hB=hB,
+    dp_turbulent=dp_turbulent,
+    nCom=nCom,
+    CDOpe=CDOpe,
+    CDClo=CDCloRat,
+    mOpe=mOpe,
+    mClo=mClo,
+    CDCloRat=CDCloRat,
+    wOpe=wOpe,
+    hOpe=hOpe,
+    dpCloRat=dpCloRat,
+    LClo=LClo,
+    vZer=3e-9/(doo_operable.wOpe*doo_operable.hOpe)) if useDoorModel and use_y
+    annotation (Placement(visible=true, transformation(
+        origin={-2,0},
+        extent={{-10,-10},{10,10}},
+        rotation=0)));
  IDEAS.Fluid.Sources.Boundary_pT bou(
 	redeclare package Medium = Medium,
 	nPorts = 2)
@@ -185,6 +209,21 @@ model CrackOrOperableDoor
 	"Door constantly opened"
 		annotation (Placement(visible = true, transformation(origin = {-54, -14}, extent = {{-6, -6}, {6, 6}}, rotation = 0)));
 
+  DoorDiscretizedOpen doo_fixed(
+    forceErrorControlOnFlow=forceErrorControlOnFlow,
+    final dh=if IDEAS.Utilities.Math.Functions.isAngle(inc, IDEAS.Types.Tilt.Ceiling)
+         or IDEAS.Utilities.Math.Functions.isAngle(inc, IDEAS.Types.Tilt.Floor)
+         then 0 else doo_fixed.hOpe*sin(inc)/nCom,
+    redeclare package Medium = Medium,
+    final hA=hA,
+    final hB=hB,
+    dp_turbulent=dp_turbulent,
+    nCom=nCom,
+    wOpe=wOpe,
+    hOpe=hOpe,
+    vZer=3e-9/(doo_fixed.wOpe*doo_fixed.hOpe),
+    CD=CDOpe) if useDoorModel and not use_y annotation (Placement(visible=true,
+        transformation(extent={{-12,-34},{8,-14}}, rotation=0)));
 initial equation
   assert( not (interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts and useDoorModel and use_y),
   "In " +getInstanceName() + ": Cannot use a controllable door unless interZonalAirFlowType == TwoPorts.");
@@ -200,19 +239,31 @@ equation
  connect(col_a2.port_b, port_a2) annotation (Line(points = {{60, -60}, {100, -60}}, color = {0, 127, 255}));
  connect(col_b1.port_b, port_b1) annotation (Line(points = {{60, 60}, {100, 60}}, color = {0, 127, 255}));
  connect(col_a1.port_b, port_a1) annotation (Line(points = {{-60, 60}, {-100, 60}}, color = {0, 127, 255}));
- connect(y, doo.y) annotation (Line(points={{-110,0},{-13,0}},color = {0, 0, 127}));
+  connect(y, doo_operable.y)
+    annotation (Line(points={{-110,0},{-13,0}}, color={0,0,127}));
  connect(bou.ports[1], port_a2) annotation (Line(points={{-1,-80},{100,-80},{100,-60}},color = {0, 127, 255}));
  if  interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts then
 	connect(point_m_flow1.port_a, port_a1) annotation (Line(points = {{-10, 60}, {-100, 60}}, color = {0, 127, 255}));
 	connect(point_m_flow1.port_b, port_b1) annotation (Line(points = {{10, 60}, {100, 60}}, color = {0, 127, 255}));
  end if;
- connect(constOne.y, doo.y) annotation (Line(points={{-47.4,-14},{-32,-14},{-32,0},{-13,0}},color = {0, 0, 127}));
  connect(bou.ports[2], port_b2) annotation (Line(points={{1,-80},{-100,-80},{-100,-60}},color = {0, 127, 255}));
- connect(doo.port_a1, port_a1) annotation (Line(points={{-12,6},{-30,6},{-30,60},{-100,60}},color = {0, 127, 255}));
- connect(doo.port_b1, port_b1) annotation (Line(points={{8,6},{30,6},{30,60},{100,60}},color = {0, 127, 255}));
- connect(doo.port_b2, port_b2) annotation (Line(points={{-12,-6},{-20,-6},{-20,-34},{-100,-34},{-100,-60}},color = {0, 127, 255}));
- connect(doo.port_a2, port_a2) annotation (Line(points={{8,-6},{20,-6},{20,-34},{100,-34},{100,-60}},color = {0, 127, 255}));
+  connect(doo_operable.port_a1, port_a1) annotation (Line(points={{-12,6},{-30,6},
+          {-30,60},{-100,60}}, color={0,127,255}));
+  connect(doo_operable.port_b1, port_b1) annotation (Line(points={{8,6},{30,6},{
+          30,60},{100,60}}, color={0,127,255}));
+  connect(doo_operable.port_b2, port_b2) annotation (Line(points={{-12,-6},{-20,
+          -6},{-20,-60},{-100,-60}}, color={0,127,255}));
+  connect(doo_operable.port_a2, port_a2) annotation (Line(points={{8,-6},{20,-6},
+          {20,-60},{100,-60}}, color={0,127,255}));
 
+  connect(doo_fixed.port_a1, port_a1) annotation (Line(points={{-12,-18},{-30,-18},
+          {-30,60},{-100,60}}, color={0,127,255}));
+  connect(doo_fixed.port_b2, port_b2) annotation (Line(points={{-12,-30},{-20,-30},
+          {-20,-60},{-100,-60}}, color={0,127,255}));
+  connect(doo_fixed.port_a2, port_a2) annotation (Line(points={{8,-30},{20,-30},
+          {20,-60},{100,-60}}, color={0,127,255}));
+  connect(doo_fixed.port_b1, port_b1) annotation (Line(points={{8,-18},{78,-18},
+          {78,60},{100,60}}, color={0,127,255}));
 annotation(Documentation(info="<html>
 <p>
 This component models infiltration or a large opening in a wall and 
