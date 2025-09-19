@@ -69,10 +69,10 @@ model CrackOrOperableDoor
  final parameter Boolean openDoorOnePort = useDoor and interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort
   "Sets whether a door is open or closed in one port configuration" ;
 
- parameter Modelica.Units.SI.PressureDifference dp_turbulent(min=0,displayUnit="Pa") = 
-	if useDoor then (MFtrans/(rho_default*(CDOpe * hOpe*wOpe * sqrt(2/rho_default))))^(1/mOpe) else 0.01
-	"Pressure difference where laminar and turbulent flow relation coincide for large cavities"
-		annotation (Dialog(tab="Advanced",group="Model regularisation", enable=useDoor));
+ parameter Modelica.Units.SI.PressureDifference dp_turbulent(min=0,displayUnit="Pa") =
+ if useDoor then max(10e-10, MFtrans/(rho_default*CDOpe*hOpe*wOpe*sqrt(2/rho_default))^(1/mOpe)) else 0.01
+ "Pressure difference where laminar and turbulent flow relation coincide for large cavities"
+  annotation (Dialog(tab="Advanced",group="Model regularisation", enable=useDoor));
  parameter Modelica.Units.SI.MassFlowRate MFtrans=(hOpe*wOpe)*VItrans*REtrans/DOpe
 	"Mass flow rate used for reguralisation"
 		annotation (Dialog(tab="Advanced",group="Model regularisation", enable=useDoor));
@@ -104,6 +104,7 @@ model CrackOrOperableDoor
 	if not useDoorModel
 	"Pressure drop equation" 
 		annotation (Placement(visible = true, transformation(origin = {0, 60}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+ mMea_flow_nominal=
  IDEAS.Airflow.Multizone.MediumColumnReversible col_b1(
 	redeclare package Medium = Medium, h=h_b1)
 	if interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts and not useDoorModel 
