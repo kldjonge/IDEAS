@@ -48,7 +48,7 @@ protected
 
   Real C "TARP coeff";
   Modelica.Units.SI.TemperatureDifference dT
-    "Surface temperature minus outdoor air temperature" annotation ();
+    "Surface temperature minus outdoor air temperature";
 equation
 
   // Assign empirical coefficient according to flow regime.
@@ -135,6 +135,11 @@ than 1 are discouraged as there appears to be little physical basis for this fac
 </p>
 </html>", revisions="<html>
 <ul>
+<li>
+September 19, 2025, by Jelger Jansen:<br/>
+Include <code>noEvent</code> to avoid state events when sign of <code>dT</code> changes.
+This is for <a href=\"https://github.com/open-ideas/IDEAS/issues/1464\">#1464</a>.
+</li>
 <li>
 August 9, 2022, by Filip Jorissen:<br/>
 Updated documentation and revised interface for issue
