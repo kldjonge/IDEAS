@@ -195,8 +195,7 @@ model Window "Multipane window"
 
   output Modelica.Units.SI.MassFlowRate mBA_flow_TrVent=trickleVent.m_flow
   if use_trickle_vent
-  "Flow through trickle-vent outwards relative to propsBus_a"
-    annotation (Placement(visible = true, transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  "Flow through trickle-vent outwards relative to propsBus_a";
 
 protected
   Airflow.Multizone.MediumColumnReversible col_trickle(redeclare package Medium
