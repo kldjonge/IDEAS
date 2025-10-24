@@ -67,7 +67,7 @@ model Window "Multipane window"
     "Window frame type"
     annotation (choicesAllMatching=true, Dialog(group=
           "Construction details"));
-  replaceable IDEAS.Buildings.Components.Shading.None shaType(use_m_flow=false)
+  replaceable IDEAS.Buildings.Components.Shading.None shaType
     constrainedby Shading.Interfaces.PartialShading(
       haveFrame=fraType.present and A*frac > 0,
       A_frame = A * frac,
@@ -288,10 +288,7 @@ initial equation
     ": You may have intended to model a frame since the parameter 'frac' is larger than zero. However, no frame type is configured such that no frame will be modelled. This may be a mistake. Set frac=0 to avoid this warning if this is intentional.",
     level=AssertionLevel.warning);
 equation
-  if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then
-    shaType.m_flow = 0;
-  else
-  end if;
+
   if use_operable_window then
     connect(y_window_internal, y_window);
   else
