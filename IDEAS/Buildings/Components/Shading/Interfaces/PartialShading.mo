@@ -26,7 +26,7 @@ partial model PartialShading "Window shading partial"
     annotation (Dialog(group="Window properties"));
 
   parameter Boolean haveBoundaryPorts = true "Include ports for setting boundary conditions";
-  parameter Boolean use_m_flow = true "conditonally remove m_flow input connector";
+  parameter Boolean use_m_flow = false "conditonally remove m_flow input connector";
   parameter Boolean haveFrame = A_frame*epsLw_frame > 0 "Frame enabled";
   parameter Modelica.Units.SI.CoefficientOfHeatTransfer hSha = 12
     "Equivalent thermal conductance of the shading device";

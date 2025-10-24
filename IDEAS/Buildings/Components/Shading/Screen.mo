@@ -1,6 +1,7 @@
 within IDEAS.Buildings.Components.Shading;
 model Screen "Controllable exterior screen"
   extends IDEAS.Buildings.Components.Shading.Interfaces.PartialShadingDevice(
+    use_m_flow=true,
     TSha = TShaScreen,
     TDryBul_internal = Ctrl_internal*TSha + (1-Ctrl_internal)*Te_internal,
     epsSw_shading = 1 - shaCorr - refSw_shading,
@@ -8,9 +9,13 @@ model Screen "Controllable exterior screen"
     TEnvExpr(y = TEnv_screen),
     TeExpr(y = TDryBul_internal));
 
-  parameter Real shaCorr(min=0, max=1) = 0.24
+  parameter Real shaCorr(
+    max=1,
+    min=0)=0.24
     "Shortwave transmittance of the screen";
-  parameter Real refSw_shading(min=0, max=1) = 0
+  parameter Real refSw_shading(
+    max=1,
+    min=0)=0
     "Shortwave reflectance of the screen";
 
 protected
@@ -29,7 +34,7 @@ public
         Ctrl_internal) + Ctrl_internal*shaCorr))
     annotation (Placement(transformation(extent={{-30,-2},{-10,18}})));
 protected
-  Modelica.Units.SI.Temperature TShaScreen = Te_internal + (HSha*(1-g_glazing) + (H - HSha) * epsSw_shading) /(hSha + abs(m_flow)*cp_air)
+  Modelica.Units.SI.Temperature TShaScreen = Te_internal + (HSha*(1-g_glazing) + (H - HSha) * epsSw_shading) /(hSha + (if use_m_flow then abs(m_flow)*cp_air else 0))
     "Modified shading device heat balance";
 initial equation
   assert( abs(shaCorr + refSw_shading + epsSw_shading - 1) < 1e-3, "In " + getInstanceName() +

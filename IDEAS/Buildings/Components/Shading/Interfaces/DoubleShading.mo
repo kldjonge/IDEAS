@@ -3,7 +3,7 @@ model DoubleShading "Two shading components in series"
   extends PartialShading(
     final controlled=stateShading1.controlled or
         stateShading2.controlled);
-  replaceable PartialShading stateShading1
+  replaceable PartialShading stateShading1(use_m_flow=use_m_flow)
   constrainedby PartialShading(
     haveFrame=haveFrame,
     A_glazing=A_glazing,
@@ -19,7 +19,7 @@ model DoubleShading "Two shading components in series"
     azi=azi)
     "First shading device"
     annotation (Placement(transformation(extent={{-28,-18},{-18,2}})));
-  replaceable PartialShading stateShading2
+  replaceable PartialShading stateShading2(use_m_flow=use_m_flow)
   constrainedby PartialShading(
     haveFrame=haveFrame,
     A_glazing=A_glazing,
