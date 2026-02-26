@@ -10,9 +10,9 @@ partial model DoorDiscretized
     displayUnit="Pa") = 0.01
     "Pressure difference where laminar and turbulent flow relation coincide. Recommended: 0.01";
 
-  Modelica.Units.SI.PressureDifference dpAB[nCom](each nominal=1)
+  Modelica.Units.SI.PressureDifference dpAB[nCom](each nominal=((1/3600)/(A*sqrt(2/rho_default)))^(1/m))
     "Pressure difference between compartments";
-  Modelica.Units.SI.Velocity v[nCom](each nominal=0.01)
+  Modelica.Units.SI.Velocity v[nCom](each nominal=0.001)
     "Velocity in compartment from A to B";
   Modelica.Units.SI.Velocity vTop "Velocity at top of opening from A to B";
   Modelica.Units.SI.Velocity vBot "Velocity at bottom of opening from A to B";
@@ -27,6 +27,9 @@ protected
 
   parameter Modelica.Units.SI.Density rho_default=Medium.density(sta_default)
     "Density, used to compute fluid volume";
+
+  final parameter Real sqrt_dp_turbulent(min=0) = sqrt(dp_turbulent)
+    "Square root of pressure difference where laminar and turbulent flow relation coincide";
 
   input Real hAg[nCom](each unit="m2/s2")=
     {Modelica.Constants.g_n*(hA - (i - 0.5)*dh) for i in 1:nCom}
@@ -118,8 +121,16 @@ using the model for a door that can be open or closed.
 revisions="<html>
 <ul>
 <li>
+September 19, 2025, by Michael Wetter:<br/>
+Introduced protected parameter <code>sqrt_dp_turbulent</code>,
+which is needed to improve computing efficiency if flow exponent is <i>0.5</i>.<br/>
+This is for
+<a href=\"https://github.com/ibpsa/modelica-ibpsa/issues/2043\">IBPSA, #2043</a>.
+</li>
+<li>
 October 29, 2024, by Klaas De Jonge:<br/>
-Unprotected <code>dh</code> and changed prefixes of <code>dh</code>,<code>hAg</code> and <code>hBg</code> to <code>input</code>. This is for <a href=\"https://github.com/ibpsa/modelica-ibpsa/issues/1935\">#1935</a>.
+Unprotected <code>dh</code> and changed prefixes of <code>dh</code>,<code>hAg</code> and <code>hBg</code> to <code>input</code>.<br/>
+This is for <a href=\"https://github.com/ibpsa/modelica-ibpsa/issues/1935\">#1935</a>.
 </li>
 <li>
 January 8, 2019, by Michael Wetter:<br/>
@@ -163,7 +174,7 @@ Renamed protected parameters for consistency with the naming conventions.
 <li><i>August 12, 2011</i> by Michael Wetter:<br/>
        Changed model to use the new function
        <a href=\"modelica://IDEAS.Airflow.Multizone.BaseClasses.powerLawFixedM\">
-       Buildings.Airflow.Multizone.BaseClasses.powerLawFixedM</a>.
+       IDEAS.Airflow.Multizone.BaseClasses.powerLawFixedM</a>.
 </li>
 <li><i>July 20, 2010</i> by Michael Wetter:<br/>
        Migrated model to Modelica 3.1 and integrated it into the Buildings library.
