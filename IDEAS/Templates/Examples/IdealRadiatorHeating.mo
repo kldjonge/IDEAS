@@ -1,6 +1,6 @@
 within IDEAS.Templates.Examples;
 model IdealRadiatorHeating "Example and test for ideal heating with radiators"
-  extends IDEAS.Templates.Examples.BaseClasses.SimpleHeatingsystem(redeclare
+  extends IDEAS.Templates.Examples.BaseClasses.SimpleHeatingsystem(replaceable
       Heating.IdealRadiatorHeating heating);
 
 equation
