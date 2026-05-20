@@ -24,7 +24,11 @@ Model that demonstrates the use of the
 IDEAS.Templates.Heating.IdealRadiatorHeating</a>.
 </p>
 </html>",     revisions="<html>
-<ul>
+<li>
+May 20, 2026 by Anna Dell'Isola:<br/>
+Add replaceable in redeclare. See 
+<a href=\"https://github.com/open-ideas/IDEAS/pull/1493\">#1493</a>.
+</li>
 <li>
 June 5, 2018 by Filip Jorissen:<br/>
 Cleaned up implementation for
