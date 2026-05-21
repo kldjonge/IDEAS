@@ -21,11 +21,6 @@ Update custom parameters in <code>sim</code>. See
 <a href=\"https://github.com/open-ideas/IDEAS/issues/1488\">#1488</a>. 
 </li>
 </ul>
-</html>", info="<html>
-<p>
-This block extends the normal SimInfoManager and adds 
-computations that are specific to the TwinHouse validation models.
-</p>
 </html>"),
     experiment(
       StartTime=20736000,
