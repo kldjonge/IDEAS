@@ -26,6 +26,7 @@ partial model PartialShading "Window shading partial"
     annotation (Dialog(group="Window properties"));
 
   parameter Boolean haveBoundaryPorts = true "Include ports for setting boundary conditions";
+  parameter Boolean use_m_flow = false "conditonally remove m_flow input connector";
   parameter Boolean haveFrame = A_frame*epsLw_frame > 0 "Frame enabled";
   parameter Modelica.Units.SI.CoefficientOfHeatTransfer hSha = 12
     "Equivalent thermal conductance of the shading device";
@@ -97,7 +98,8 @@ partial model PartialShading "Window shading partial"
     Placement(visible = true, transformation(extent = {{-80, 90}, {-40, 130}}, rotation = 0), iconTransformation(origin = {-50, 120}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   Modelica.Blocks.Interfaces.RealOutput TDryBul if haveBoundaryPorts "Exterior surface air temperature" annotation (
     Placement(visible = true, transformation(extent = {{20, -30}, {60, 10}}, rotation = 0), iconTransformation(extent = {{40, -10}, {60, 10}}, rotation = 0)));
-  Modelica.Blocks.Interfaces.RealInput m_flow annotation(
+  Modelica.Blocks.Interfaces.RealInput m_flow if use_m_flow
+                                              annotation(
     Placement(visible = true, transformation(origin = {-20, 0}, extent = {{80, -110}, {40, -70}}, rotation = 0), iconTransformation(origin = {30, -100}, extent = {{10, -10}, {-10, 10}}, rotation = -90)));
 protected
   Modelica.Blocks.Interfaces.RealInput Te_internal(unit="K");

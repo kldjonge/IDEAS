@@ -59,6 +59,12 @@ protected
   Modelica.Units.SI.Angle verAzi
     "Angle between projection of sun's rays and normal to vertical surface";
 
+public
+  Modelica.Blocks.Sources.RealExpression HShaDirexpr(y=fraSunDir*HDirTil)
+    annotation (Placement(transformation(extent={{-30,40},{-10,60}})));
+  Modelica.Blocks.Sources.RealExpression HShaSkyDifexpr(y=fraSunDifSky*
+        HSkyDifTil)
+    annotation (Placement(transformation(extent={{-30,20},{-10,40}})));
 initial equation
 
     assert(dep > 0, "The depth of the overhang must be larger than zero.");
@@ -94,15 +100,17 @@ equation
   crShdArea=IDEAS.Utilities.Math.Functions.smoothMax(x1=crShdArea1,x2=crShdArea2,deltaX=0.01);
   fraSunDir = IDEAS.Utilities.Math.Functions.smoothMin( x1=IDEAS.Utilities.Math.Functions.smoothMax(x1=1-crShdArea/AWin,x2=0,deltaX=0.01),x2=1.0,deltaX=0.01);
 
-  HShaDirTil = fraSunDir*HDirTil;
-  HShaSkyDifTil=fraSunDifSky*HSkyDifTil;
 
   connect(angInc, iAngInc) annotation (Line(
       points={{-60,-50},{-14,-50},{-14,-50},{40,-50}},
       color={0,0,127},
       smooth=Smooth.None));
-  connect(HGroDifTil, HShaGroDifTil) annotation (Line(points={{-60,10},{-14,10},
-          {-14,10},{40,10}}, color={0,0,127}));
+  connect(HShaDirexpr.y, HShaDir.u)
+    annotation (Line(points={{-9,50},{-1.2,50}}, color={0,0,127}));
+  connect(HShaSkyDifexpr.y, HShaSkyDif.u)
+    annotation (Line(points={{-9,30},{-1.2,30}}, color={0,0,127}));
+  connect(HShaSkyGro.u, HGroDifTil)
+    annotation (Line(points={{-1.2,10},{-60,10}}, color={0,0,127}));
   annotation (                   Documentation(info="<html>
 <p>
 Shading model of an overhang above a window where

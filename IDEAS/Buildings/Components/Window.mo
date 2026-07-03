@@ -33,6 +33,7 @@ model Window "Multipane window"
     crackOrOperableDoor(
       wOpe=A/hWin,
       hOpe=hWin,
+      nCom=if abs(hWin*sin(inc)) < 0.01 then 1 else max(2, integer(abs(hWin*sin(inc)))),
       hA=0.5*hVertical,
       hB=0.5*hzone_a - hRelSurfBot_a,
       useDoor = use_operable_window,
@@ -195,8 +196,7 @@ model Window "Multipane window"
 
   output Modelica.Units.SI.MassFlowRate mBA_flow_TrVent=trickleVent.m_flow
   if use_trickle_vent
-  "Flow through trickle-vent outwards relative to propsBus_a"
-    annotation (Placement(visible = true, transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  "Flow through trickle-vent outwards relative to propsBus_a";
 
 protected
   Airflow.Multizone.MediumColumnReversible col_trickle(redeclare package Medium
@@ -261,8 +261,7 @@ protected
     final azi = aziInt,
     nPorts=if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort
          then (if use_trickle_vent then 2 else 1) else (if use_trickle_vent then 3 else 2),
-    table = coeffsCp,
-    use_TDryBul_in = true)
+    table = coeffsCp)
  if sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None
     "Outside air model"
     annotation (Placement(visible = true, transformation(origin = {0, 10}, extent = {{-40, -100}, {-20, -80}}, rotation = 0)));
@@ -289,13 +288,7 @@ initial equation
     ": You may have intended to model a frame since the parameter 'frac' is larger than zero. However, no frame type is configured such that no frame will be modelled. This may be a mistake. Set frac=0 to avoid this warning if this is intentional.",
     level=AssertionLevel.warning);
 equation
-  if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then
-    shaType.m_flow = 0;
-  else
-    connect(outsideAir.m_flow, shaType.m_flow) annotation (
-      Line(points={{-41,-86},{-59.7,-86},{-59.7,-63.4772}},
-                                                          color = {0, 0, 127}));
-  end if;
+
   if use_operable_window then
     connect(y_window_internal, y_window);
   else
@@ -364,9 +357,6 @@ equation
                                                                       color = {0, 0, 127}));
   connect(shaType.hForcedConExt, radSolData.hForcedConExt) annotation (
     Line(points={{-68.5,-32.7043},{-76,-32.7043},{-76,-62.2},{-79.4,-62.2}},
-                                                                    color = {0, 0, 127}));
-  connect(outsideAir.TDryBul_in, shaType.TDryBul) annotation (
-    Line(points={{-42,-90},{-46,-90},{-46,-49.4895},{-57.5,-49.4895}},
                                                                     color = {0, 0, 127}));
   connect(trickleVent.y, y_trickleVent) annotation (
     Line(points={{36,-92},{36,-106},{30,-106},{30,-120}},

@@ -159,9 +159,9 @@ equation
   connect(TDryBul, sideFins.TDryBul) annotation (Line(points={{40,-10},{3.5,-10},
           {3.5,26.6667}}, color={0,0,127}));
   connect(m_flow, sideFins.m_flow) annotation(
-    Line(points = {{40, -90}, {2, -90}, {2, 20}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{2.5,-90},{2.5,20}},    color = {0, 0, 127}));
   connect(m_flow, overhang.m_flow) annotation(
-    Line(points = {{40, -90}, {4, -90}, {4, 60}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{4.5,-90},{4.5,60}},    color = {0, 0, 127}));
   annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
             -100},{100,200}})),  Documentation(info="<html>
 <p>

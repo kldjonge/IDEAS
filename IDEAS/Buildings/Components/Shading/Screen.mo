@@ -1,6 +1,7 @@
 within IDEAS.Buildings.Components.Shading;
 model Screen "Controllable exterior screen"
   extends IDEAS.Buildings.Components.Shading.Interfaces.PartialShadingDevice(
+    use_m_flow=true,
     TSha = TShaScreen,
     TDryBul_internal = Ctrl_internal*TSha + (1-Ctrl_internal)*Te_internal,
     epsSw_shading = 1 - shaCorr - refSw_shading,
@@ -8,28 +9,46 @@ model Screen "Controllable exterior screen"
     TEnvExpr(y = TEnv_screen),
     TeExpr(y = TDryBul_internal));
 
-  parameter Real shaCorr(min=0, max=1) = 0.24
+  parameter Real shaCorr(
+    max=1,
+    min=0)=0.24
     "Shortwave transmittance of the screen";
-  parameter Real refSw_shading(min=0, max=1) = 0
+  parameter Real refSw_shading(
+    max=1,
+    min=0)=0
     "Shortwave reflectance of the screen";
-    
+
 protected
   constant Modelica.Units.SI.SpecificHeatCapacity cp_air = 1004 "Specific heat capacity";
   Modelica.Units.SI.Temperature TEnv_screen = Ctrl_internal*TSha + (1-Ctrl_internal)*TEnv_internal
     "Assuming the environment temperature is a weighted average of the shading device temperature and the ambient temperature";
   // This assumes that the window rejects 1-g_glazing of the incoming solar irradation is entirely converted into sensible heat
-  Modelica.Units.SI.Temperature TShaScreen = Te_internal + (HSha*(1-g_glazing) + (H - HSha) * epsSw_shading) /(hSha + abs(m_flow)*cp_air)
+public
+  Modelica.Blocks.Sources.RealExpression HShaDirexpr(y=HDirTil*((1 -
+        Ctrl_internal) + Ctrl_internal*shaCorr))
+    annotation (Placement(transformation(extent={{-30,38},{-10,58}})));
+  Modelica.Blocks.Sources.RealExpression HShaSkyDifexpr(y=HSkyDifTil*((1 -
+        Ctrl_internal) + Ctrl_internal*shaCorr))
+    annotation (Placement(transformation(extent={{-30,18},{-10,38}})));
+  Modelica.Blocks.Sources.RealExpression HShaGroDifexpr(y=HGroDifTil*((1 -
+        Ctrl_internal) + Ctrl_internal*shaCorr))
+    annotation (Placement(transformation(extent={{-30,-2},{-10,18}})));
+protected
+  Modelica.Units.SI.Temperature TShaScreen = Te_internal + (HSha*(1-g_glazing) + (H - HSha) * epsSw_shading) /(hSha + (if use_m_flow then abs(m_flow)*cp_air else 0))
     "Modified shading device heat balance";
 initial equation
   assert( abs(shaCorr + refSw_shading + epsSw_shading - 1) < 1e-3, "In " + getInstanceName() +
     ": The sum of the screen transmittance 'shaCorr', reflectance 'refSw_shading' and absorptance 'epsSw_shading' does not equal one. This is non-physical.");
 equation
-  HShaDirTil = HDirTil*((1 - Ctrl_internal) + Ctrl_internal*shaCorr);
-  HShaSkyDifTil = HSkyDifTil*((1 - Ctrl_internal) + Ctrl_internal*shaCorr);
-  HShaGroDifTil = HGroDifTil*((1 - Ctrl_internal) + Ctrl_internal*shaCorr);
 
   connect(angInc, iAngInc) annotation (Line(points={{-60,-50},{-14,-50},{-14,
           -50},{40,-50}}, color={0,0,127}));
+  connect(HShaDirexpr.y, HShaDir.u)
+    annotation (Line(points={{-9,48},{-8,50},{-1.2,50}}, color={0,0,127}));
+  connect(HShaSkyDifexpr.y, HShaSkyDif.u)
+    annotation (Line(points={{-9,28},{-8,30},{-1.2,30}}, color={0,0,127}));
+  connect(HShaGroDifexpr.y, HShaSkyGro.u)
+    annotation (Line(points={{-9,8},{-8,10},{-1.2,10}}, color={0,0,127}));
   annotation (
     Icon(coordinateSystem(extent = {{-100, -100}, {100, 200}})),
     Documentation(info="<html>
