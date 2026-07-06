@@ -208,8 +208,7 @@ protected
         rotation=180)));
   Airflow.Multizone.MediumColumnReversible outside_trickleCol(redeclare package
       Medium = Medium, h=hTrickleVent - (Habs_surf - hAbs_floor_a)) if
-    use_trickle_vent and sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts
-                                                                                                                 "Column for connecting outside side of trickle vent"
+    use_trickle_vent and sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts  "Column for connecting outside side of trickle vent"
     annotation (Placement(visible=true, transformation(
         origin={78,-92},
         extent={{-70,-10},{-50,10}},
@@ -251,8 +250,10 @@ protected
         start=T_start))                                                                             if addCapGla
     "Heat capacitor for glazing at exterior"
     annotation (Placement(transformation(extent={{-20,-12},{0,-32}})));
-  IDEAS.Fluid.Sources.OutsideAir outsideAir(
+  BFG_MVP.Fluid.Sources.OutsideAir_Pollutants
+                                 outsideAir_Pollutants(
     redeclare package Medium = Medium,
+    use_C_in=true,
     Cs=if not use_custom_Cs and sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts
          and not use_sim_Cs then sim.Cs_coeff*(Habs^(2*sim.a)) elseif not
         use_custom_Cs then sim.Cs else Cs,
@@ -267,8 +268,8 @@ protected
     annotation (Placement(visible = true, transformation(origin = {0, 10}, extent = {{-40, -100}, {-20, -80}}, rotation = 0)));
 
   IDEAS.Fluid.Sources.MassFlowSource_T boundary3(
-    redeclare package Medium = Medium, 
-    m_flow = 1e-10, 
+    redeclare package Medium = Medium,
+    m_flow = 1e-10,
     nPorts = 1)  if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts and not use_trickle_vent
      "Boundary for bus a" annotation(
     Placement(transformation(origin = {-14, -76}, extent = {{-28, -76}, {-8, -56}}, rotation = 90)));
@@ -362,21 +363,24 @@ equation
     Line(points={{36,-92},{36,-106},{30,-106},{30,-120}},
                                            color = {0, 0, 127}));
   if sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then
-    connect(crackOrOperableDoor.port_a1, outsideAir.ports[1]) annotation (
-    Line(points={{20,-46},{16,-46},{16,-80},{-20,-80}},          color = {0, 127, 255}));
+    connect(crackOrOperableDoor.port_a1, outsideAir_Pollutants.ports[1])
+      annotation (Line(points={{20,-46},{16,-46},{16,-80},{-20,-80}}, color={0,
+            127,255}));
   end if;
   if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts then
-    connect(crackOrOperableDoor.port_b2, outsideAir.ports[2]) annotation (
-    Line(points={{20,-58},{16,-58},{16,-80},{-20,-80}},          color = {0, 127, 255}));
+    connect(crackOrOperableDoor.port_b2, outsideAir_Pollutants.ports[2])
+      annotation (Line(points={{20,-58},{16,-58},{16,-80},{-20,-80}}, color={0,
+            127,255}));
   end if;
- connect(outside_trickleCol.port_b, outsideAir.ports[if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts then 3 else 2]) annotation (
-    Line(points={{18,-102},{18,-110},{6,-110},{6,-80},{-20,-80}},
-                                           color = {0, 127, 255}));
+  connect(outside_trickleCol.port_b, outsideAir_Pollutants.ports[if sim.interZonalAirFlowType
+     == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts then 3 else 2])
+    annotation (Line(points={{18,-102},{18,-110},{6,-110},{6,-80},{-20,-80}},
+        color={0,127,255}));
   connect(outside_trickleCol.port_a, trickleVent.port_a)
     annotation (Line(points={{18,-82},{18,-80},{26,-80}}, color={0,127,255}));
  if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.OnePort and use_trickle_vent then
- connect(outsideAir.ports[2], trickleVent.port_a) annotation (Line(points={{-20,-80},
-            {-20,-80},{26,-80}},                                                                        color={0,127,255}));
+    connect(outsideAir_Pollutants.ports[2], trickleVent.port_a) annotation (
+        Line(points={{-20,-80},{-20,-80},{26,-80}}, color={0,127,255}));
    end if;
  connect(y_window_trunc.y, solWin.y) annotation (
     Line(points={{-10,-79},{-10,-58}},      color = {0, 0, 127}));
@@ -387,7 +391,7 @@ equation
     Line(points={{46,-80},{50,-80},{50,19.91},{56.09,19.91}},          color = {0, 127, 255}));
  end if;
  connect(trickleVent.port_b, col_trickle.port_a) annotation(
-    Line(points = {{40, -80}, {52, -80}, {52, -50}}, color = {0, 127, 255}));
+    Line(points={{46,-80},{52,-80},{52,-50}},        color = {0, 127, 255}));
  connect(col_trickle.port_b, propsBusInt.port_3) annotation(
     Line(points = {{52, -30}, {52, 20}, {56, 20}}, color = {0, 127, 255}));
  connect(boundary3.ports[1], propsBusInt.port_3) annotation(

@@ -103,8 +103,10 @@ protected
   Modelica.Blocks.Math.Add solDif(final k1=1, final k2=1)
     "Sum of ground and sky diffuse solar irradiation"
     annotation (Placement(transformation(extent={{-54,0},{-46,8}})));
-  IDEAS.Fluid.Sources.OutsideAir outsideAir(
+  BFG_MVP.Fluid.Sources.OutsideAir_Pollutants
+                                 outsideAir_Pollutants(
     redeclare package Medium = Medium,
+    use_C_in=true,
     final table=coeffsCp,
     final azi=aziInt,
     Cs=if not use_custom_Cs and sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts
@@ -117,10 +119,10 @@ protected
  if sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None
     "Outside air model"
     annotation (Placement(transformation(extent={{-100,-60},{-80,-40}})));
-    
+
   IDEAS.Fluid.Sources.MassFlowSource_T boundary3(
-    redeclare package Medium = Medium, 
-    m_flow = 1e-10, 
+    redeclare package Medium = Medium,
+    m_flow = 1e-10,
     nPorts = 1)  if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts
      "Boundary for bus a" annotation(
     Placement(transformation(origin = {48, -4}, extent = {{-28, -76}, {-8, -56}})));
@@ -200,14 +202,16 @@ equation
   connect(shaType.HShaGroDifTil, solDif.u2) annotation (Line(points={{-64.5,36},
           {-56,36},{-56,1.6},{-54.8,1.6}}, color={0,0,127}));
   connect(radSolData.hForcedConExt, extCon.hForcedConExt) annotation (Line(points={{-79.4,
-          -8.2},{-46,-8.2},{-46,-34},{-16,-34},{-16,-27},{-22,-27}},color={0,0,127}));
+          -8.2},{-46,-8.2},{-46,-34},{-16,-34},{-16,-22},{-44,-22}},color={0,0,127}));
   if sim.interZonalAirFlowType <> IDEAS.BoundaryConditions.Types.InterZonalAirFlow.None then
-    connect(crackOrOperableDoor.port_a1, outsideAir.ports[1]) annotation (Line(points={{20,-36},{
-          16,-36},{16,-50},{-80,-50}},color={0,127,255}));
+    connect(crackOrOperableDoor.port_a1, outsideAir_Pollutants.ports[1])
+      annotation (Line(points={{20,-46},{16,-46},{16,-50},{-80,-50}}, color={0,
+            127,255}));
   end if;
   if sim.interZonalAirFlowType == IDEAS.BoundaryConditions.Types.InterZonalAirFlow.TwoPorts then
-    connect(crackOrOperableDoor.port_b2, outsideAir.ports[2]) annotation (Line(points={{20,-60},{16,
-          -60},{16,-50},{-80,-50}}, color={0,127,255}));
+    connect(crackOrOperableDoor.port_b2, outsideAir_Pollutants.ports[2])
+      annotation (Line(points={{20,-58},{16,-58},{16,-50},{-80,-50}}, color={0,
+            127,255}));
   end if;
   connect(boundary3.ports[1], propsBusInt.port_3) annotation(
     Line(points = {{40, -70}, {56, -70}, {56, 20}}, color = {0, 127, 255}));
