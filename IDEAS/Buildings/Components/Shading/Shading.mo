@@ -701,28 +701,28 @@ equation
   connect(boxAndScreen.TDryBul, TDryBul) annotation (Line(points={{-8.5,
           -55.3333},{40,-55.3333},{40,-10}},
                                    color={0,0,127}));
-  
-  
+
+
   connect(m_flow, boxAndScreen.m_flow) annotation(
-    Line(points = {{40, -90}, {-12, -90}, {-12, -62}, {-10, -62}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-12,-90},{-12,-62},{-9.5,-62}},         color = {0, 0, 127}));
   connect(m_flow, none.m_flow) annotation(
-    Line(points = {{40, -90}, {-10, -90}, {-10, -40}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-9.5,-90},{-9.5,-40}},      color = {0, 0, 127}));
   connect(m_flow, sideFins.m_flow) annotation(
-    Line(points = {{40, -90}, {-10, -90}, {-10, -20}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-9.5,-90},{-9.5,-20}},      color = {0, 0, 127}));
   connect(m_flow, screen.m_flow) annotation(
-    Line(points = {{40, -90}, {-10, -90}, {-10, 0}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-9.5,-90},{-9.5,0}},      color = {0, 0, 127}));
   connect(m_flow, overhangAndScreen.m_flow) annotation(
-    Line(points = {{40, -90}, {-10, -90}, {-10, 20}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-9.5,-90},{-9.5,20}},      color = {0, 0, 127}));
   connect(m_flow, overhang.m_flow) annotation(
-    Line(points = {{40, -90}, {-10, -90}, {-10, 40}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-9.5,-90},{-9.5,40}},      color = {0, 0, 127}));
   connect(m_flow, buildingShade.m_flow) annotation(
-    Line(points = {{40, -90}, {-10, -90}, {-10, 60}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-9.5,-90},{-9.5,60}},      color = {0, 0, 127}));
   connect(m_flow, box.m_flow) annotation(
-    Line(points = {{40, -90}, {-10, -90}, {-10, 80}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-9.5,-90},{-9.5,80}},      color = {0, 0, 127}));
   connect(m_flow, horizontalFins.m_flow) annotation(
-    Line(points = {{40, -90}, {-10, -90}, {-10, 100}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-9.5,-90},{-9.5,100}},      color = {0, 0, 127}));
   connect(m_flow, overhangAndHorizontalFins.m_flow) annotation(
-    Line(points = {{40, -90}, {-10, -90}, {-10, 120}}, color = {0, 0, 127}));
+    Line(points={{40,-90},{-9.5,-90},{-9.5,120}},      color = {0, 0, 127}));
   annotation (Documentation(revisions="<html>
 <ul>
 <li>

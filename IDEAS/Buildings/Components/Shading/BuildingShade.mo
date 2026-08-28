@@ -2,7 +2,7 @@ within IDEAS.Buildings.Components.Shading;
 model BuildingShade
   "Component for modeling shade cast by distant objects such as buildings and treelines"
   extends IDEAS.Buildings.Components.Shading.Interfaces.PartialShadingDevice(
-    final controlled=false);
+      use_m_flow=false, final controlled=false);
 
   parameter Modelica.Units.SI.Length L(min=0)
     "Distance to object perpendicular to window"
@@ -10,10 +10,12 @@ model BuildingShade
   parameter Modelica.Units.SI.Length dh
     "Height difference between top of object and top of window glazing"
     annotation (Dialog(group="Dimensions (see illustration in documentation)"));
-  parameter Modelica.Units.SI.Length hWin(min=0) = 1
+  parameter Modelica.Units.SI.Length hWin(min=0)=1
     "Window height: distance between top and bottom of window glazing"
     annotation (Dialog(group="Dimensions (see illustration in documentation)"));
-  parameter Real fraSha(min=0,max=1) = 1
+  parameter Real fraSha(
+    max=1,
+    min=0)=1
     "Fraction of the light that is shaded, e.g. smaller than 1 for shading cast by tree lines.";
   final parameter Real fraSunDifSky(final min=0,final max=1, final unit="1") = 1-vieAngObj/(Modelica.Constants.pi/2)
     "Fraction of window area exposed to diffuse sun light";
@@ -23,6 +25,11 @@ model BuildingShade
 
   // Computation assumes that window base is at ground level.
   // Viewing angle computed from center of glazing.
+  Modelica.Blocks.Sources.RealExpression HShaDirexpr(y=fraSunDir*HDirTil)
+    annotation (Placement(transformation(extent={{-30,40},{-10,60}})));
+  Modelica.Blocks.Sources.RealExpression HShaSkyDifexpr(y=fraSunDifSky*
+        HSkyDifTil)
+    annotation (Placement(transformation(extent={{-30,20},{-10,40}})));
 protected
   parameter Modelica.Units.SI.Angle vieAngObj=atan((hWin/2 + dh)/L)
     "Viewing angle of opposite object";
@@ -57,13 +64,16 @@ equation
     fraSunDir=1;
   end if;
 
-  HShaDirTil=fraSunDir*HDirTil;
-  HShaSkyDifTil = fraSunDifSky*HSkyDifTil;
+
   connect(angInc, iAngInc) annotation (Line(points={{-60,-50},{-14,-50},{-14,-50},
           {40,-50}}, color={0,0,127}));
 
-  connect(HGroDifTil, HShaGroDifTil)
-    annotation (Line(points={{-60,10},{40,10},{40,10}}, color={0,0,127}));
+  connect(HShaDirexpr.y, HShaDir.u)
+    annotation (Line(points={{-9,50},{-1.2,50}}, color={0,0,127}));
+  connect(HShaSkyDifexpr.y, HShaSkyDif.u)
+    annotation (Line(points={{-9,30},{-1.2,30}}, color={0,0,127}));
+  connect(HGroDifTil, HShaSkyGro.u)
+    annotation (Line(points={{-60,10},{-1.2,10}}, color={0,0,127}));
   annotation (
     Icon(coordinateSystem(extent = {{-100, -100}, {100, 200}})),
     Documentation(info="<html>
