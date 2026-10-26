@@ -4,11 +4,6 @@ model OutsideAirFile
   extends Modelica.Icons.Example;
   package Medium = IDEAS.Media.Air(extraPropertiesNames={"CO2"}) "Medium model for air";
 
-  parameter Modelica.Units.SI.Angle incAngSurNor[:]=
-    {0, 45, 90, 135, 180, 225, 270, 315}*2*Modelica.Constants.pi/360
-    "Wind incidence angles";
-  parameter Real Cp[:] = {0.4, 0.1, -0.3, -0.35, -0.2, -0.35, -0.3, 0.1}
-    "Cp values";
   IDEAS.Fluid.Sources.OutsideAir     west(
     redeclare package Medium = Medium,
     azi=IDEAS.Types.Azimuth.W) "Model with outside conditions"
@@ -16,8 +11,7 @@ model OutsideAirFile
   inner BoundaryConditions.SimInfoManager sim(
     use_sim_Cs=true,
     usePollutantSchedule=true,
-    outdoorFileName=ModelicaServices.ExternalReferences.loadResource(
-        "modelica://IDEAS/Resources/outdoorpollutiondata/outsideAir_simple.mos"),
+    outdoorFileName=ModelicaServices.ExternalReferences.loadResource("modelica://IDEAS/Resources/outdoorpollutiondata/outsideAir_simple.mos"),
     nC=Medium.nC)
     annotation (Placement(transformation(extent={{-102,78},{-82,98}})));
   annotation (__Dymola_Commands(file="modelica://IDEAS/Resources/Scripts/Dymola/Fluid/Sources/Examples/OutsideAir.mos"
