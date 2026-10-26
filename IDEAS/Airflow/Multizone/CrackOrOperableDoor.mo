@@ -2,15 +2,16 @@ within IDEAS.Airflow.Multizone;
 model CrackOrOperableDoor
  "Infiltration or large opening model used for the embeded airflow implementation in IDEAS.Buildings.Components"
  extends IDEAS.Fluid.Interfaces.PartialFourPortInterface(
-		redeclare final package Medium1 = Medium,
-		redeclare final package Medium2 = Medium,
-		final allowFlowReversal1=true,
-		final allowFlowReversal2=true,
-		final m1_flow_nominal=10/3600*rho_default,
-		final m2_flow_nominal=m1_flow_nominal,
-		final m1_flow_small=1E-4*abs(m1_flow_nominal),
-		final m2_flow_small=1E-4*abs(m2_flow_nominal));
- extends IDEAS.Airflow.Multizone.BaseClasses.ErrorControl(forceErrorControlOnFlow=true); //force error control on flow rates
+  redeclare final package Medium1 = Medium,
+  redeclare final package Medium2 = Medium,
+  final allowFlowReversal1=true,
+  final allowFlowReversal2=true,
+  final m1_flow_nominal=10/3600*rho_default,
+  final m2_flow_nominal=m1_flow_nominal,
+  final m1_flow_small=1E-4*abs(m1_flow_nominal),
+  final m2_flow_small=1E-4*abs(m2_flow_nominal));
+ extends IDEAS.Airflow.Multizone.BaseClasses.ErrorControl(
+      forceErrorControlOnFlow=false);                                                    //force error control on flow rates
 
  replaceable package Medium =Modelica.Media.Interfaces.PartialMedium "Medium in the component" annotation (choices(choice(redeclare package Medium = IDEAS.Media.Air "Moist air")));
  parameter IDEAS.BoundaryConditions.Types.InterZonalAirFlow interZonalAirFlowType "Interzonal air flow type";
@@ -19,9 +20,9 @@ model CrackOrOperableDoor
  parameter Real q50(unit="m3/(h.m2)") "Surface air tightness" annotation (Dialog(group="Crack or Closed door",enable=not useDoor or use_y));
  parameter Modelica.Units.SI.Length wOpe=0.9 "Width of opening"   annotation (Dialog(group="Open door",enable=useDoor));
  parameter Modelica.Units.SI.Length hOpe=2.1 "Height of opening" annotation (Dialog(group="Open door",enable=useDoor));
- parameter Integer nCom=if abs(hOpe*sin(inc)) < 0.01 then 1 else max(2,integer(abs(hOpe*sin(inc))/4))
-	"Number of compartments for the discretization"
-		annotation (Dialog(group="Open door",enable=useDoor));
+ parameter Integer nCom=if abs(hOpe*sin(inc)) < 0.01 then 1 else max(2,integer(abs(hOpe*sin(inc))/0.25))
+ "Number of compartments for the discretization"
+  annotation (Dialog(group="Open door",enable=useDoor));
 
  parameter Modelica.Units.SI.Length h_b1=0
 	"Height of crack at port b1 (hasCavity=false), center of conected zone is 0" 
