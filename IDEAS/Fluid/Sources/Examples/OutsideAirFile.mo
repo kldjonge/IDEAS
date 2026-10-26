@@ -17,7 +17,7 @@ model OutsideAirFile
     use_sim_Cs=true,
     usePollutantSchedule=true,
     outdoorFileName=ModelicaServices.ExternalReferences.loadResource(
-        "modelica://IDEAS/Resources/outdoorpollutiondata/outsideAir_simple.csv"),
+        "modelica://IDEAS/Resources/outdoorpollutiondata/outsideAir_simple.mos"),
     nC=Medium.nC)
     annotation (Placement(transformation(extent={{-102,78},{-82,98}})));
   annotation (__Dymola_Commands(file="modelica://IDEAS/Resources/Scripts/Dymola/Fluid/Sources/Examples/OutsideAir.mos"
