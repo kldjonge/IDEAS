@@ -291,8 +291,9 @@ protected
 public
   parameter Boolean usePollutantSchedule=false annotation(Evaluate=true,Dialog(tab="Advanced", group="Outdoor pollutants"),choices(checkBox=true));
 
-  IDEAS.BoundaryConditions.OutdoorAirPollution.ReaderOutdoorAirPollution readerOutdoorAirPollution(nC=nC,
-    fileName=outdoorFileName) if usePollutantSchedule   annotation (Placement(transformation(extent={{-100,-90},{-80,-70}})));
+  IDEAS.BoundaryConditions.OutdoorAirPollution.ReaderOutdoorAirPollution pollDat(nC=nC,
+      fileName=outdoorFileName) if usePollutantSchedule
+    annotation (Placement(transformation(extent={{-100,-90},{-80,-70}})));
   parameter String outdoorFileName if usePollutantSchedule  "Name of the file containing the outdoor pollutant concentrations"   annotation (Dialog(enable=usePollutantSchedule, tab="Advanced", group="Outdoor pollutants",loadSelector(caption="Select the file")));
   parameter Integer nC(min=1)=1 "Number of tracers in the medium"  annotation (Dialog(enable=usePollutantSchedule,tab="Advanced", group="Outdoor pollutants"));
 
@@ -326,7 +327,7 @@ equation
 
   //guard for conditional component readerOutdoorAirPollution
   if usePollutantSchedule then
-    connect(readerOutdoorAirPollution.pollutantsOutdoorAir,C_outdoor);
+    connect(pollDat.pollutantsOutdoorAir, C_outdoor);
   else
     C_outdoor= fill(0,1);
   end if;
