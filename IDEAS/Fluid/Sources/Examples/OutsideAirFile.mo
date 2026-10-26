@@ -32,7 +32,7 @@ First implementation.
 </ul>
 </html>"),
     experiment(
-      StartTime=1.728e+07,
-      StopTime=1.78848e+07,
-      Tolerance=1e-6));
+      StopTime=86400,
+      Tolerance=1e-06,
+      __Dymola_Algorithm="Dassl"));
 end OutsideAirFile;
